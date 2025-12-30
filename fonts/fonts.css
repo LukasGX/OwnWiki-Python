@@ -1,0 +1,24 @@
+@font-face {
+	font-family: "Montserrat";
+	src: url("Montserrat/Montserrat-Regular.ttf");
+}
+
+@font-face {
+	font-family: "OpenSans";
+	src: url("OpenSans/OpenSans-Regular.ttf");
+}
+
+@font-face {
+	font-family: "Parkinsans";
+	src: url("Parkinsans/Parkinsans-Regular.ttf");
+}
+
+@font-face {
+	font-family: "Roboto";
+	src: url("Roboto/Roboto-Regular.ttf");
+}
+
+@font-face {
+	font-family: "SourceSans3";
+	src: url("SourceSans3/SourceSans3-Regular.ttf");
+}
