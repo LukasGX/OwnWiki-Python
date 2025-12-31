@@ -32,21 +32,6 @@
 					class="side-logo"
 					alt="OwnWiki Logo" />
 				<div class="side-links">
-					{% if logged_in %}
-					<!-- logged in -->
-					<span class="h">[[USERNAME]]</span>
-					<span><a href="backend/logout.php">Abmelden</a></span>
-					{% else %}
-					<!-- not logged in -->
-					<span><a href="?f=special:login">Anmelden</a></span>
-					<span
-						><a href="?f=special:createaccount"
-							>Konto erstellen</a
-						></span
-					>
-					{% endif %}
-				</div>
-				<div class="side-links">
 					<span class="h">Navigation</span>
 					<span><a href="?f=main:mainpage">Hauptseite</a></span>
 					<span
@@ -61,74 +46,18 @@
 						></span
 					>
 				</div>
-				<div class="side-links">
-					{% if is_admin %}
-					<!-- is admin -->
-					<span class="h">Werkzeuge</span>
-					<span
-						><a href="?f=special:permanent&t=[[TITLE]]"
-							>Permanenter Link</a
-						></span
-					>
-					<span
-						><a href="?f=special:move&t=[[TITLE]]"
-							>Verschieben</a
-						></span
-					>
-					<span
-						><a href="?f=special:delete&t=[[TITLE]]"
-							>Löschen</a
-						></span
-					>
-					<span
-						><a href="?f=special:protect&t=[[TITLE]]"
-							>Schützen</a
-						></span
-					>
-					{% else %}
-					<!-- is not admin -->
-					<span class="h">Werkzeuge</span>
-					<span
-						><a href="?f=special:permanent&t=[[TITLE]]"
-							>Permanenter Link</a
-						></span
-					>
-					{% endif %}
-				</div>
 			</div>
 
 			<div class="content">
-				<h1 class="page_title">{{ title }}</h1>
-				<div class="titlebar">
-					<div class="group">
-						<span class="element active"
-							><i class="fas fa-file"></i> Artikel</span
-						>
-						<span class="element"
-							><i class="fas fa-comment"></i> Diskussion</span
-						>
-						<span class="element"><i class="far fa-star"></i></span>
-					</div>
-					<div class="group">
-						{% if permissions.edit %}
-						<span class="element"
-							><a href="?f=special:edit&t=$pagename"
-								><i class="fas fa-pen"></i> Bearbeiten</a
-							></span
-						>
-						{% else %}
-						<span class="element"
-							><i class="fas fa-code"></i> Quelltext
-							anzeigen</span
-						>
-						{% endif %}
-						<span class="element"
-							><i class="fas fa-clock"></i>
-							Versionsgeschichte</span
-						>
-					</div>
-				</div>
-				{{ content | safe }}
+				<h1 class="page_title">Bei OwnWiki anmelden</h1>
+				<form action="/api/v1/login" method="post">
+					<label for="username">Benutzername:</label>
+					<input type="text" id="username" name="username" required />
+					<label for="pw">Passwort:</label>
+					<input type="password" id="pw" name="pw" required />
+
+					<input type="submit" value="Anmelden" class="wide" />
+				</form>
 			</div>
 		</div>
 

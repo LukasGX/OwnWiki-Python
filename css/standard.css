@@ -211,6 +211,12 @@ button.full {
 	width: 100%;
 }
 
+input[type="submit"].wide,
+button.wide {
+	padding-left: 3rem;
+	padding-right: 3rem;
+}
+
 .codeh {
 	font-family: monospace;
 	font-size: 1rem;
@@ -255,7 +261,11 @@ button.full {
 	font-size: 2rem;
 	margin-bottom: 0.8rem;
 
-	background-image: linear-gradient(to right, rgba(42, 44, 254, 0.5) 0%, rgba(42, 44, 254, 0.5) 100%);
+	background-image: linear-gradient(
+		to right,
+		rgba(42, 44, 254, 0.5) 0%,
+		rgba(42, 44, 254, 0.5) 100%
+	);
 	background-repeat: no-repeat;
 	background-size: 100% 4px;
 	background-position: left 100%;
@@ -291,7 +301,11 @@ button.full {
 }
 
 .titlebar span.active {
-	background-image: linear-gradient(to right, rgba(42, 44, 254, 0.5) 0%, rgba(42, 44, 254, 0.5) 100%);
+	background-image: linear-gradient(
+		to right,
+		rgba(42, 44, 254, 0.5) 0%,
+		rgba(42, 44, 254, 0.5) 100%
+	);
 	background-repeat: no-repeat;
 	background-size: 100% 3px;
 	background-position: left 100%;
