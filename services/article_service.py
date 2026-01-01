@@ -22,4 +22,6 @@ def return_article(namespace: str, name: str):
     return {
         "content": html,
         "title": json_content["title"],
+        "noControls": json_content.get("noControls", False),
+        "protected": json_content.get("protected", "none")
     }

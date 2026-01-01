@@ -34,21 +34,17 @@
 				<div class="side-links">
 					{% if logged_in %}
 					<!-- logged in -->
-					<span class="h">[[USERNAME]]</span>
-					<span><a href="backend/logout.php">Abmelden</a></span>
+					<span class="h">{{ username }}</span>
+					<span><a href="#" onclick="logout()">Abmelden</a></span>
 					{% else %}
 					<!-- not logged in -->
-					<span><a href="?f=special:login">Anmelden</a></span>
-					<span
-						><a href="?f=special:createaccount"
-							>Konto erstellen</a
-						></span
-					>
+					<span><a href="/login">Anmelden</a></span>
+					<span><a href="/register">Konto erstellen</a></span>
 					{% endif %}
 				</div>
 				<div class="side-links">
 					<span class="h">Navigation</span>
-					<span><a href="?f=main:mainpage">Hauptseite</a></span>
+					<span><a href="/wiki/main:main">Hauptseite</a></span>
 					<span
 						><a href="?f=special:randompage"
 							>Zufällige Seite</a
@@ -99,6 +95,7 @@
 
 			<div class="content">
 				<h1 class="page_title">{{ title }}</h1>
+				{% if controls %}
 				<div class="titlebar">
 					<div class="group">
 						<span class="element active"
@@ -110,9 +107,9 @@
 						<span class="element"><i class="far fa-star"></i></span>
 					</div>
 					<div class="group">
-						{% if permissions.edit %}
+						{% if permissions[needed_right] %}
 						<span class="element"
-							><a href="?f=special:edit&t=$pagename"
+							><a href="/wiki/{{ page }}/edit"
 								><i class="fas fa-pen"></i> Bearbeiten</a
 							></span
 						>
@@ -128,7 +125,7 @@
 						>
 					</div>
 				</div>
-				{{ content | safe }}
+				{% endif %} {{ content | safe }}
 			</div>
 		</div>
 
@@ -149,5 +146,6 @@
 		<script src="/js/sel2.js"></script>
 		<script src="/js/codehighlight.js"></script>
 		<script src="/js/manipulate_datetime.js"></script>
+		<script src="/js/bridges.js"></script>
 	</body>
 </html>
