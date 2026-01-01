@@ -14,7 +14,7 @@ from api.v1.routers import articles, user
 from services.article_service import return_article
 
 # import middleware
-from sessions import init_middleware, get_session_data, set_session_data
+from sessions import init_middleware, get_session_data
 
 init()
 
@@ -86,13 +86,69 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1)):
     else:
         needed_right = "edit" # fallback
 
+    roles: list = request.session.get("roles", [])
+
+    if len(roles) > 0 and "admin" in roles[0].split(";"):
+        is_admin = True
+    else:
+        is_admin = False
+
     context = {
         "request": request,
         "title": data["title"],
         "content": data["content"],
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
-        "is_admin": False,
+        "is_admin": is_admin,
+        "controls": data["noControls"] == False,
+        "protected": data["protected"],
+        "needed_right": needed_right,
+        "page": page,
+        "permissions": {
+            "edit": True
+        },
+    }
+    return templates.TemplateResponse("read.html", context)
+
+@app.get("/wiki/{page}/edit", response_class=HTMLResponse)
+async def edit_page(request: Request, page: str = Path(..., min_length=1)):
+    if ":" not in page:
+        raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
+    splitted = page.split(":")
+    data = return_article(splitted[0], splitted[1])
+
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+
+    # get needed right
+    if data["protected"] == "none":
+        needed_right = "edit"
+    elif data["protected"] == "semiprotected":
+        needed_right = "editsemiprotected"
+    elif data["protected"] == "protected":
+        needed_right = "editprotected"
+    elif data["protected"] == "superprotected":
+        needed_right = "editsuperprotected"
+    else:
+        needed_right = "edit" # fallback
+
+    groups = session.get("groups", [])
+
+    if "admin" in session:
+        is_admin = True
+    else:
+        is_admin = False
+
+    context = {
+        "request": request,
+        "title": data["title"],
+        "content": data["content"],
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous"),
+        "is_admin": is_admin,
         "controls": data["noControls"] == False,
         "protected": data["protected"],
         "needed_right": needed_right,

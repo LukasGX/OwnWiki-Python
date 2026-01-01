@@ -6,9 +6,6 @@ from typing import Any
 from dotenv import load_dotenv
 import os
 
-class SessionData(BaseModel):
-    username: str = ""
-
 load_dotenv()
 
 # get from .env
@@ -32,8 +29,9 @@ def init_middleware(app: Any) -> None:
 def get_session_data(request: Request) -> Dict[str, Any]:
     return request.session
 
-def set_session_data(request: Request, username: str):
+def set_session_data(request: Request, username: str, roles: str):
     request.session["username"] = username
+    request.session["roles"] = roles
 
 def clear_session(request: Request):
     request.session.clear()

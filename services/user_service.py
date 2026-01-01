@@ -1,4 +1,5 @@
 import hashlib
+import json
 from fastapi import Request, status
 from fastapi.responses import RedirectResponse
 from api.v1.deps import connect_db
@@ -20,10 +21,10 @@ def login_s(request: Request, username: str, password: str, redirect: str, conn)
 
     # create session data
     try:
-        set_session_data(request, username)
+        set_session_data(request, username, user["roles"])
     except Exception:
-        # fallback to direct session assignment if helper unavailable
-        request.session["username"] = username
+        # no fallback
+        pass
 
     # store roles (normalize to list)
     roles = user.get("roles") if isinstance(user, dict) else user["roles"]

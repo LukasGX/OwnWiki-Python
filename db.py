@@ -32,7 +32,7 @@ def init_db() -> None:
     try:
         cursor.execute(
             "INSERT INTO users (firstname, lastname, username, email, password_hash, roles) VALUES (?, ?, ?, ?, ?, ?)",
-            ("-", "-", "admin", "admin@ownwiki.local", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "[\"admin\"]")
+            ("-", "-", "admin", "admin@ownwiki.local", "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "['admin']")
         )
         conn.commit()
     except sqlite3.IntegrityError:
