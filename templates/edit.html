@@ -8,6 +8,19 @@
 		<link rel="stylesheet" href="/fonts/fonts.css" />
 		<link rel="stylesheet" href="/font-awesome/css/all.css" />
 		<link rel="stylesheet" href="/css/standard.css" />
+		<link
+			rel="shortcut icon"
+			href="/static/favicon.ico"
+			type="image/x-icon" />
+
+		<style>
+			textarea {
+			    width: 100%;
+			    min-height: 40px;
+			    max-height: 60vh;
+			    border: 1px solid #ccc;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="header">
@@ -94,12 +107,14 @@
 			</div>
 
 			<div class="content">
-				<h1 class="page_title">{{ title }}</h1>
+				<h1 class="page_title">{{ title }} bearbeiten</h1>
 				{% if controls %}
 				<div class="titlebar">
 					<div class="group">
-						<span class="element active"
-							><i class="fas fa-file"></i> Artikel</span
+						<span class="element"
+							><a href="/wiki/{{ page }}"
+								><i class="fas fa-file"></i> Artikel</a
+							></span
 						>
 						<span class="element"
 							><i class="fas fa-comment"></i> Diskussion</span
@@ -108,13 +123,13 @@
 					</div>
 					<div class="group">
 						{% if permissions[needed_right] %}
-						<span class="element"
+						<span class="element active"
 							><a href="/wiki/{{ page }}/edit"
 								><i class="fas fa-pen"></i> Bearbeiten</a
 							></span
 						>
 						{% else %}
-						<span class="element"
+						<span class="element active"
 							><i class="fas fa-code"></i> Quelltext
 							anzeigen</span
 						>
@@ -125,7 +140,25 @@
 						>
 					</div>
 				</div>
-				{% endif %} {{ content | safe }}
+				{% endif %}
+				<div style="display: flex; gap: 1rem;">
+					<div style="width: 49%;">
+						<textarea
+							name="content"
+							id="content"
+							style="height: max-content;">
+							{{- content -}}
+						</textarea
+						><br />
+						<button id="save">Speichern</button>
+					</div>
+					<div id="preview-wrapper" style="width: 49%;">
+						<button id="update-preview">
+							<i class="fas fa-rotate"></i>
+						</button>
+						<div id="preview"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -146,6 +179,18 @@
 		<script src="/js/sel2.js"></script>
 		<script src="/js/codehighlight.js"></script>
 		<script src="/js/manipulate_datetime.js"></script>
+		<script>
+			const PAGE = "{{ page }}";
+		</script>
 		<script src="/js/bridges.js"></script>
+
+		<script>
+			const ta = document.getElementById('content');
+			ta.addEventListener('input', () => {
+			    ta.style.height = 'auto';
+			    ta.style.height = ta.scrollHeight + 'px';
+			});
+			ta.style.height = ta.scrollHeight + 'px';
+		</script>
 	</body>
 </html>

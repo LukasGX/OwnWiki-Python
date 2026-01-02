@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
-import markdown
+from helper.gethtml import get_html
 from fastapi import HTTPException
 
 PAGES_DIR = Path(__file__).parent.parent / "pages"
 
-def return_article(namespace: str, name: str):
+def return_article(namespace: str, name: str, raw: bool = False):
     json_path = PAGES_DIR / f"{namespace}/{name}.json"
     md_path = PAGES_DIR / f"{namespace}/{name}.md"
     
@@ -17,11 +17,34 @@ def return_article(namespace: str, name: str):
     
     # open safely
     json_content = json.loads(json_path.read_text(encoding="utf-8"))
-    html = markdown.markdown(md_path.read_text(encoding="utf-8"))
+
+    md_content = md_path.read_text(encoding="utf-8")
+    html = get_html(md_content)
+    md = md_content
+
+    if raw:
+        toReturn = md
+    else:
+        toReturn = html
     
     return {
-        "content": html,
+        "content": toReturn,
         "title": json_content["title"],
         "noControls": json_content.get("noControls", False),
         "protected": json_content.get("protected", "none")
     }
+
+def save_article(namespace: str, name: str, content: str):
+    md_path = PAGES_DIR / f"{namespace}/{name}.md"
+    
+    # check path
+    if not md_path.exists():
+        raise HTTPException(404, f"Article '{namespace}:{name}' not found")
+    
+    # checks for content
+    # later ...
+    
+    # save content
+    md_path.write_text(content, encoding="utf-8")
+    
+    return {"status": "success", "message": f"Article '{namespace}:{name}' saved successfully."}

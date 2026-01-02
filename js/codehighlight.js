@@ -34,7 +34,12 @@ function openWordlistModal(words) {
 async function editRule(rule, isNew = false) {
 	var data;
 
-	const types = { "diff-length": "diff-length", wordlist: "wordlist", "capital-ratio": "capital-ratio", "repeat-word": "repeat-word" };
+	const types = {
+		"diff-length": "diff-length",
+		wordlist: "wordlist",
+		"capital-ratio": "capital-ratio",
+		"repeat-word": "repeat-word"
+	};
 	const checks = { gt: ">=", lt: "<=", tf: "schlägt an" };
 	const actions = { block: "Blockieren", warn: "Warnen" };
 
@@ -43,38 +48,66 @@ async function editRule(rule, isNew = false) {
 		const response = await fetch("backend/autoCheckRuleGet.php", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ "rule-id": rule }),
+			body: JSON.stringify({ "rule-id": rule })
 		});
 		data = await response.json();
 	} else {
 		// default settings
-		data = { enabled: true, pattern: { type: "diff-length", check: "gt", threshold: "" }, action: { type: "block" } };
+		data = {
+			enabled: true,
+			pattern: { type: "diff-length", check: "gt", threshold: "" },
+			action: { type: "block" }
+		};
 	}
 	openModal(`
 	<h2>Regel ${isNew == true ? "erstellen" : "bearbeiten"}</h2>
 	${isNew == true ? "" : `<input type='hidden' name='rule-id' value='${rule}'>`}
-	<input type='checkbox' name='rule-active' id='checkbox-rule-active' value='true' ${data.enabled === true ? "checked" : ""}> Aktiviert<br><br>
-	${isNew == true ? "<input type='text' name='rule-id' placeholder='Regel-ID'>" : ""}
-	<input type='text' name='rule-name' id='input-rule-name' placeholder='Regel-Name' value='${data.name ?? ""}'>
+	<input type='checkbox' name='rule-active' id='checkbox-rule-active' value='true' ${
+		data.enabled === true ? "checked" : ""
+	}> Aktiviert<br><br>
+	${
+		isNew == true
+			? "<input type='text' name='rule-id' placeholder='Regel-ID'>"
+			: ""
+	}
+	<input type='text' name='rule-name' id='input-rule-name' placeholder='Regel-Name' value='${
+		data.name ?? ""
+	}'>
 	<select name='pattern-type' id='select-pattern-type'>
 		${Object.keys(types)
-			.map((t) => (t == (data.pattern && data.pattern.type) ? `<option value='${t}' selected>${types[t]}</option>` : `<option value='${t}'>${types[t]}</option>`))
+			.map((t) =>
+				t == (data.pattern && data.pattern.type)
+					? `<option value='${t}' selected>${types[t]}</option>`
+					: `<option value='${t}'>${types[t]}</option>`
+			)
 			.join("")}
 	</select>
 	<select name='pattern-check' id='select-pattern-check'>
 		${Object.keys(checks)
-			.map((c) => (c == (data.pattern && data.pattern.check) ? `<option value='${c}' selected>${checks[c]}</option>` : `<option value='${c}'>${checks[c]}</option>`))
+			.map((c) =>
+				c == (data.pattern && data.pattern.check)
+					? `<option value='${c}' selected>${checks[c]}</option>`
+					: `<option value='${c}'>${checks[c]}</option>`
+			)
 			.join("")}
 	</select>
-	<input type='text' name='pattern-threshold' id='input-pattern-threshold' placeholder='Schwellwert' value='${data.pattern.threshold ?? ""}'>
+	<input type='text' name='pattern-threshold' id='input-pattern-threshold' placeholder='Schwellwert' value='${
+		data.pattern.threshold ?? ""
+	}'>
 	<input type='text' name='pattern-wordlist' id='input-pattern-wordlist' placeholder='Wortliste' style='display: none;'>
 	<p>Konsequenz</p>
 	<select name='action-type' id='select-action-type'>
 		${Object.keys(actions)
-			.map((a) => (a == data.action.type ? `<option value='${a}' selected>${actions[a]}</option>` : `<option value='${a}'>${actions[a]}</option>`))
+			.map((a) =>
+				a == data.action.type
+					? `<option value='${a}' selected>${actions[a]}</option>`
+					: `<option value='${a}'>${actions[a]}</option>`
+			)
 			.join("")}
 	</select>
-	<input type='text' name='action-message' id='input-action-message' placeholder='Nachricht' value='${data.action.message ?? ""}' style='display: none;'>
+	<input type='text' name='action-message' id='input-action-message' placeholder='Nachricht' value='${
+		data.action.message ?? ""
+	}' style='display: none;'>
 	<button id='send' class='full'>Speichern</button>
 	`);
 
@@ -116,11 +149,19 @@ async function editRule(rule, isNew = false) {
 			alert("Bitte mindestens ein Wort in die Wortliste einfügen.");
 			return;
 		}
-		if ((type == "diff-length" || type == "capital-ratio") && (isNaN(threshold) || threshold.length == 0)) {
+		if (
+			(type == "diff-length" || type == "capital-ratio") &&
+			(isNaN(threshold) || threshold.length == 0)
+		) {
 			alert("Bitte einen gültigen Schwellwert eingeben.");
 			return;
 		}
-		if (type == "repeat-word" && (isNaN(threshold) || threshold.length == 0 || parseInt(threshold) < 2)) {
+		if (
+			type == "repeat-word" &&
+			(isNaN(threshold) ||
+				threshold.length == 0 ||
+				parseInt(threshold) < 2)
+		) {
 			alert("Bitte einen gültigen Schwellwert (mindestens 2) eingeben.");
 			return;
 		}
@@ -130,37 +171,41 @@ async function editRule(rule, isNew = false) {
 			response = await fetch("backend/autoCheckRuleEdit.php", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/json"
 				},
 				body: JSON.stringify({
 					"rule-id": ruleID,
 					"rule-name": $("#input-rule-name").val(),
-					"rule-active": $("#checkbox-rule-active").is(":checked") ? "true" : "false",
+					"rule-active": $("#checkbox-rule-active").is(":checked")
+						? "true"
+						: "false",
 					"pattern-type": type,
 					"pattern-check": check,
 					"pattern-threshold": threshold,
 					"pattern-words": words,
 					"action-type": $("#select-action-type").val(),
-					"action-message": $("#input-action-message").val(),
-				}),
+					"action-message": $("#input-action-message").val()
+				})
 			});
 		} else {
 			response = await fetch("backend/autoCheckRuleNew.php", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/json"
 				},
 				body: JSON.stringify({
 					"rule-id": ruleID,
 					"rule-name": $("#input-rule-name").val(),
-					"rule-active": $("#checkbox-rule-active").is(":checked") ? "true" : "false",
+					"rule-active": $("#checkbox-rule-active").is(":checked")
+						? "true"
+						: "false",
 					"pattern-type": type,
 					"pattern-check": check,
 					"pattern-threshold": threshold,
 					"pattern-words": words,
 					"action-type": $("#select-action-type").val(),
-					"action-message": $("#input-action-message").val(),
-				}),
+					"action-message": $("#input-action-message").val()
+				})
 			});
 		}
 		const data = await response.json();
@@ -191,7 +236,7 @@ function deleteRule(rule) {
 		fetch("backend/autoCheckRuleDelete.php", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ "rule-id": rule }),
+			body: JSON.stringify({ "rule-id": rule })
 		}).then((response) => {
 			if (response.ok) {
 				window.location.reload();
@@ -207,8 +252,8 @@ const previewButton = document.querySelector(".preview-button");
 const previewOutput = document.querySelector(".code-preview");
 const saveButton = document.querySelector(".save-button");
 
-if (previewButton) {
-	previewButton.addEventListener("click", async function () {
+if (previewBtn) {
+	previewBtn.addEventListener("click", async function () {
 		previewOutput.innerHTML = "<p>Loading...</p>";
 
 		const codeContent = textareaElement.value;
@@ -216,9 +261,9 @@ if (previewButton) {
 		const response = await fetch("backend/renderAPI.php", {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/json",
+				"Content-Type": "application/json"
 			},
-			body: JSON.stringify({ text: codeContent }),
+			body: JSON.stringify({ text: codeContent })
 		});
 		const data = await response.json();
 
@@ -249,23 +294,23 @@ if (saveButton) {
 			response = await fetch("backend/saveAPI.php", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/json"
 				},
 				body: JSON.stringify({
 					text: codeContent,
-					title: titleFromGet,
-				}),
+					title: titleFromGet
+				})
 			});
 		} else if (filename.endsWith("edit")) {
 			response = await fetch("backend/editAPI.php", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/json"
 				},
 				body: JSON.stringify({
 					text: codeContent,
-					title: titleFromGet,
-				}),
+					title: titleFromGet
+				})
 			});
 		} else {
 			console.error(`${filename} doesn't match any!`);
@@ -328,7 +373,8 @@ blockBtn.addEventListener("click", async function () {
 	const meId = ME_ID;
 	const target = document.getElementById("target").value;
 	const scope = $("#scope").val();
-	const optCreateAccounts = document.getElementById("optCreateAccounts").value;
+	const optCreateAccounts =
+		document.getElementById("optCreateAccounts").value;
 	const optSendEmails = document.getElementById("optSendEmails").value;
 	const optOwnDiscussion = document.getElementById("optOwnDiscussion").value;
 	const durationUntil = document.getElementById("datetimePicker").value;
@@ -339,7 +385,7 @@ blockBtn.addEventListener("click", async function () {
 	const response = await fetch("backend/blockAPI.php", {
 		method: "POST",
 		headers: {
-			"Content-Type": "application/json",
+			"Content-Type": "application/json"
 		},
 		body: JSON.stringify({
 			target: target,
@@ -349,8 +395,8 @@ blockBtn.addEventListener("click", async function () {
 			optOwnDiscussion: optOwnDiscussion,
 			durationUntil: durationUntil,
 			reason: reason,
-			meId: meId,
-		}),
+			meId: meId
+		})
 	});
 
 	const data = await response.json();

@@ -8,6 +8,10 @@
 		<link rel="stylesheet" href="/fonts/fonts.css" />
 		<link rel="stylesheet" href="/font-awesome/css/all.css" />
 		<link rel="stylesheet" href="/css/standard.css" />
+		<link
+			rel="shortcut icon"
+			href="/static/favicon.ico"
+			type="image/x-icon" />
 	</head>
 	<body>
 		<div class="header">
@@ -45,17 +49,9 @@
 				<div class="side-links">
 					<span class="h">Navigation</span>
 					<span><a href="/wiki/main:main">Hauptseite</a></span>
-					<span
-						><a href="?f=special:randompage"
-							>Zufällige Seite</a
-						></span
-					>
-					<span><a href="?f=special:logs">Logbücher</a></span>
-					<span
-						><a href="?f=special:specialpages"
-							>Spezialseiten</a
-						></span
-					>
+					<span><a href="#">Zufällige Seite</a></span>
+					<span><a href="#">Logbücher</a></span>
+					<span><a href="#">Spezialseiten</a></span>
 				</div>
 				<div class="side-links">
 					{% if is_admin %}

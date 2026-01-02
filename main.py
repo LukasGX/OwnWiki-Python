@@ -1,3 +1,4 @@
+import re
 from fastapi import Depends, FastAPI, HTTPException, Request, Path
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -41,6 +42,7 @@ app.mount("/fonts", StaticFiles(directory="fonts"), name="fonts")
 app.mount("/font-awesome", StaticFiles(directory="font-awesome"), name="font-awesome")
 app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 app.mount("/pages", StaticFiles(directory="pages"), name="pages")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 templates = Jinja2Templates(directory="templates")
@@ -115,7 +117,7 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1)):
     if ":" not in page:
         raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
     splitted = page.split(":")
-    data = return_article(splitted[0], splitted[1])
+    data = return_article(splitted[0], splitted[1], True)
 
     session = get_session_data(request)
     if "username" in session:
@@ -135,17 +137,17 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1)):
     else:
         needed_right = "edit" # fallback
 
-    groups = session.get("groups", [])
-
     if "admin" in session:
         is_admin = True
     else:
         is_admin = False
 
+    content = data["content"].lstrip("\t ")
+
     context = {
         "request": request,
         "title": data["title"],
-        "content": data["content"],
+        "content": content,
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
@@ -157,4 +159,4 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1)):
             "edit": True
         },
     }
-    return templates.TemplateResponse("read.html", context)
+    return templates.TemplateResponse("edit.html", context)
