@@ -1,7 +1,7 @@
 import re
 from fastapi import Depends, FastAPI, HTTPException, Request, Path
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import db
@@ -9,10 +9,11 @@ import db
 from colorama import init, Fore
 
 # import routers
-from api.v1.routers import articles, user
+from api.v1.routers import articles, user, roles
 
 # import services
 from services.article_service import return_article
+from services.roles_service import get_role_color
 
 # import middleware
 from sessions import init_middleware, get_session_data
@@ -35,6 +36,7 @@ init_middleware(app)
 
 app.include_router(articles.router, prefix="/api/v1/articles", tags=["articles"])
 app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
+app.include_router(roles.router, prefix="/api/v1/roles", tags=["roles"])
 
 app.mount("/css", StaticFiles(directory="css"), name="css")
 app.mount("/js", StaticFiles(directory="js"), name="js") 
@@ -111,6 +113,45 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1)):
         },
     }
     return templates.TemplateResponse("read.html", context)
+
+@app.get("/account", response_class=HTMLResponse)
+async def wiki_page(request: Request):
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+        return RedirectResponse(
+            url="/login",
+            status_code=302)
+
+    rolesr: list = request.session.get("roles", [])
+
+    if len(rolesr) > 0 and "admin" in rolesr[0].split(";"):
+        is_admin = True
+        roles = rolesr[0].split(";")
+    else:
+        is_admin = False
+
+    role_colors = {}
+
+    for role in roles:
+        role = role.strip()
+        color = get_role_color(role)
+        role_colors[role] = color
+
+    context = {
+        "request": request,
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous"),
+        "is_admin": is_admin,
+        "roles": (roles or rolesr),
+        "role_colors": role_colors,
+        "permissions": {
+            "edit": True
+        },
+    }
+    return templates.TemplateResponse("account.html", context)
 
 @app.get("/wiki/{page}/edit", response_class=HTMLResponse)
 async def edit_page(request: Request, page: str = Path(..., min_length=1)):

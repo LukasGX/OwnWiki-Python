@@ -708,3 +708,37 @@ button.wide {
 .close:hover {
 	color: #c70000;
 }
+
+/* Account page */
+.user-full {
+	background-color: rgba(0, 0, 0, 0.03);
+	padding: 1rem;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+
+	margin-bottom: 1rem;
+}
+
+.infos p {
+	margin: 0;
+}
+
+p.username {
+	font-weight: bold;
+	font-size: 1.2rem;
+	margin-bottom: 0.3rem;
+}
+
+.role:first-of-type {
+	margin-left: 0.4rem;
+}
+
+.role {
+	font-family: "SourceSans3", sans-serif;
+	background-color: rgba(0, 0, 0, 0.1);
+	color: #000000;
+	padding: 0.1rem 0.8rem;
+	border-radius: 8px;
+	font-size: 0.92rem;
+	margin-right: 0.3rem;
+}

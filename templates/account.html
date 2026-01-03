@@ -54,75 +54,26 @@
 					<span><a href="#">Logbücher</a></span>
 					<span><a href="#">Spezialseiten</a></span>
 				</div>
-				<div class="side-links">
-					{% if is_admin %}
-					<!-- is admin -->
-					<span class="h">Werkzeuge</span>
-					<span
-						><a href="?f=special:permanent&t=[[TITLE]]"
-							>Permanenter Link</a
-						></span
-					>
-					<span
-						><a href="?f=special:move&t=[[TITLE]]"
-							>Verschieben</a
-						></span
-					>
-					<span
-						><a href="?f=special:delete&t=[[TITLE]]"
-							>Löschen</a
-						></span
-					>
-					<span
-						><a href="?f=special:protect&t=[[TITLE]]"
-							>Schützen</a
-						></span
-					>
-					{% else %}
-					<!-- is not admin -->
-					<span class="h">Werkzeuge</span>
-					<span
-						><a href="?f=special:permanent&t=[[TITLE]]"
-							>Permanenter Link</a
-						></span
-					>
-					{% endif %}
-				</div>
 			</div>
 
 			<div class="content">
-				<h1 class="page_title">{{ title }}</h1>
-				{% if controls %}
-				<div class="titlebar">
-					<div class="group">
-						<span class="element active"
-							><i class="fas fa-file"></i> Artikel</span
-						>
-						<span class="element"
-							><i class="fas fa-comment"></i> Diskussion</span
-						>
-						<span class="element"><i class="far fa-star"></i></span>
-					</div>
-					<div class="group">
-						{% if permissions[needed_right] %}
-						<span class="element"
-							><a href="/wiki/{{ page }}/edit"
-								><i class="fas fa-pen"></i> Bearbeiten</a
-							></span
-						>
-						{% else %}
-						<span class="element"
-							><i class="fas fa-code"></i> Quelltext
-							anzeigen</span
-						>
-						{% endif %}
-						<span class="element"
-							><i class="fas fa-clock"></i>
-							Versionsgeschichte</span
-						>
+				<h1 class="page_title">Mein Konto</h1>
+
+				<div class="user-full">
+					<div class="infos">
+						<p class="username">{{ username }}</p>
+						<p class="roles">
+							Rollen {% for role in roles %}
+							<span
+								class="role"
+								style="background-color: {{ role_colors[role] }};">
+								<!-- Not an error -->
+								{{ role }}
+							</span>
+							{% endfor %}
+						</p>
 					</div>
 				</div>
-				{% endif %} {{ content | safe }}
 			</div>
 		</div>
 
