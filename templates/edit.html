@@ -106,58 +106,69 @@
 				</div>
 			</div>
 
-			<div class="content">
-				<h1 class="page_title">{{ title }} bearbeiten</h1>
-				{% if controls %}
-				<div class="titlebar">
-					<div class="group">
-						<span class="element"
-							><a href="/wiki/{{ page }}"
-								><i class="fas fa-file"></i> Artikel</a
-							></span
-						>
-						<span class="element"
-							><i class="fas fa-comment"></i> Diskussion</span
-						>
-						<span class="element"><i class="far fa-star"></i></span>
+			<div class="content-wrapper">
+				<div class="content">
+					<h1 class="page_title">{{ title }} bearbeiten</h1>
+					{% if controls %}
+					<div class="titlebar">
+						<div class="group">
+							<span class="element"
+								><a href="/wiki/{{ page }}"
+									><i class="fas fa-file"></i> Artikel</a
+								></span
+							>
+							<span class="element"
+								><i class="fas fa-comment"></i> Diskussion</span
+							>
+							<span class="element"
+								><i class="far fa-star"></i
+							></span>
+						</div>
+						<div class="group">
+							{% if permissions[needed_right] %}
+							<span class="element active"
+								><a href="/wiki/{{ page }}/edit"
+									><i class="fas fa-pen"></i> Bearbeiten</a
+								></span
+							>
+							{% else %}
+							<span class="element active"
+								><i class="fas fa-code"></i> Quelltext
+								anzeigen</span
+							>
+							{% endif %}
+							<span class="element"
+								><i class="fas fa-clock"></i>
+								Versionsgeschichte</span
+							>
+						</div>
 					</div>
-					<div class="group">
-						{% if permissions[needed_right] %}
-						<span class="element active"
-							><a href="/wiki/{{ page }}/edit"
-								><i class="fas fa-pen"></i> Bearbeiten</a
-							></span
-						>
-						{% else %}
-						<span class="element active"
-							><i class="fas fa-code"></i> Quelltext
-							anzeigen</span
-						>
-						{% endif %}
-						<span class="element"
-							><i class="fas fa-clock"></i>
-							Versionsgeschichte</span
-						>
-					</div>
-				</div>
-				{% endif %}
-				<div style="display: flex; gap: 1rem;">
-					<div style="width: 49%;">
-						<textarea
-							name="content"
-							id="content"
-							style="height: max-content;">
+					{% endif %}
+					<div style="display: flex; gap: 1rem;">
+						<div style="width: 49%;">
+							<textarea
+								name="content"
+								id="content"
+								style="height: max-content;">
 							{{- content -}}
 						</textarea
-						><br />
-						<button id="save">Speichern</button>
+							><br />
+							<button id="save">Speichern</button>
+						</div>
+						<div id="preview-wrapper" style="width: 49%;">
+							<button id="update-preview">
+								<i class="fas fa-rotate"></i>
+							</button>
+							<div id="preview"></div>
+						</div>
 					</div>
-					<div id="preview-wrapper" style="width: 49%;">
-						<button id="update-preview">
-							<i class="fas fa-rotate"></i>
-						</button>
-						<div id="preview"></div>
-					</div>
+				</div>
+
+				<div id="poweredby">
+					<img
+						src="/resources/ownwiki-logo-mini.png"
+						alt="OwnWiki Logo" />
+					<p>Powered by<br />OwnWiki</p>
 				</div>
 			</div>
 		</div>

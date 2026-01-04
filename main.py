@@ -13,10 +13,14 @@ from api.v1.routers import articles, user, roles
 
 # import services
 from services.article_service import return_article
-from services.roles_service import get_role_color
+from services.roles_service import get_role_color, get_role_name
+from services.user_service import update_session
 
 # import middleware
 from sessions import init_middleware, get_session_data
+
+# import deps
+from api.v1.deps import connect_db
 
 init()
 
@@ -54,7 +58,8 @@ async def root():
     raise HTTPException(status_code=404, detail="Not found")
 
 @app.get("/whoami")
-async def whoami(request: Request):
+async def whoami(request: Request, conn = Depends(connect_db)):
+    update_session(request, request.session.get("username", ""), conn)
     session = get_session_data(request)
     return {"username": session.get("username", "Anonymous")}
 
@@ -66,9 +71,12 @@ async def login_page(request: Request):
     return templates.TemplateResponse("login.html", context)
 
 @app.get("/wiki/{page}", response_class=HTMLResponse)
-async def wiki_page(request: Request, page: str = Path(..., min_length=1)):
+async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
     if ":" not in page:
         raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
+    
+    update_session(request, request.session.get("username", ""), conn)
+
     splitted = page.split(":")
     data = return_article(splitted[0], splitted[1])
 
@@ -115,7 +123,9 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1)):
     return templates.TemplateResponse("read.html", context)
 
 @app.get("/account", response_class=HTMLResponse)
-async def wiki_page(request: Request):
+async def wiki_page(request: Request, conn = Depends(connect_db)):
+    update_session(request, request.session.get("username", ""), conn)
+
     session = get_session_data(request)
     if "username" in session:
         logged_in = True
@@ -133,20 +143,31 @@ async def wiki_page(request: Request):
     else:
         is_admin = False
 
+    # role colors
     role_colors = {}
-
     for role in roles:
         role = role.strip()
         color = get_role_color(role)
         role_colors[role] = color
 
+    # role names
+    role_names = {}
+    for role in roles:
+        role = role.strip()
+        name = get_role_name(role)
+        role_names[role] = name
+
     context = {
         "request": request,
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
+        "firstname": session.get("firstname", ""),
+        "lastname": session.get("lastname", ""),
+        "email": session.get("email", ""),
         "is_admin": is_admin,
         "roles": (roles or rolesr),
         "role_colors": role_colors,
+        "role_names": role_names,
         "permissions": {
             "edit": True
         },
@@ -154,9 +175,12 @@ async def wiki_page(request: Request):
     return templates.TemplateResponse("account.html", context)
 
 @app.get("/wiki/{page}/edit", response_class=HTMLResponse)
-async def edit_page(request: Request, page: str = Path(..., min_length=1)):
+async def edit_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
     if ":" not in page:
         raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
+    
+    update_session(request, request.session.get("username", ""), conn)
+
     splitted = page.split(":")
     data = return_article(splitted[0], splitted[1], True)
 

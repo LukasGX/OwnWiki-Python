@@ -56,23 +56,49 @@
 				</div>
 			</div>
 
-			<div class="content">
-				<h1 class="page_title">Mein Konto</h1>
+			<div class="content-wrapper">
+				<div class="content">
+					<h1 class="page_title">Mein Konto</h1>
 
-				<div class="user-full">
-					<div class="infos">
-						<p class="username">{{ username }}</p>
-						<p class="roles">
-							Rollen {% for role in roles %}
-							<span
-								class="role"
-								style="background-color: {{ role_colors[role] }};">
-								<!-- Not an error -->
-								{{ role }}
-							</span>
-							{% endfor %}
+					<div class="user-full">
+						<div class="infos">
+							<p class="username">{{ username }}</p>
+							<p class="realname">
+								{{ firstname }} {{ lastname }}
+							</p>
+							<p class="email">{{ email }}</p>
+							<p class="roles">
+								Rollen {% for role in roles %}
+								<span
+									class="role"
+									style="background-color: {{ role_colors[role] }};">
+									<!-- Not an error -->
+									{{ role_names[role] }}
+								</span>
+								{% endfor %}
+							</p>
+						</div>
+						<p class="public-info">
+							<i class="fas fa-circle-info"></i>
+							Ihr Benutzername, Ihr Vorname und Ihre Rollen sind
+							öffentlich sichtbar. Sie können zusätzlich Ihren
+							Nachnamen und Ihre E-Mail-Adresse veröffentlichen.
 						</p>
 					</div>
+
+					<h2>Einstellungen</h2>
+					<p class="info-settings">
+						<i class="fas fa-circle-info"></i>
+						In Zukunft können Sie hier Ihre Kontoeinstellungen
+						ändern.
+					</p>
+				</div>
+
+				<div id="poweredby">
+					<img
+						src="/resources/ownwiki-logo-mini.png"
+						alt="OwnWiki Logo" />
+					<p>Powered by<br />OwnWiki</p>
 				</div>
 			</div>
 		</div>

@@ -21,7 +21,7 @@ def login_s(request: Request, username: str, password: str, redirect: str, conn)
 
     # create session data
     try:
-        set_session_data(request, username, user["roles"])
+        set_session_data(request, username, user["roles"], user["firstname"], user["lastname"], user["email"])
     except Exception:
         # no fallback
         pass
@@ -43,6 +43,32 @@ def login_s(request: Request, username: str, password: str, redirect: str, conn)
             status_code=status.HTTP_302_FOUND
         )
     return {"status": "logged_in", "user": username, "roles": roles_list}
+
+def update_session(request: Request, username: str, conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    user = cursor.fetchone()
+
+    if user is None:
+        return {"error": "User not found"}
+
+    try:
+        set_session_data(request, username, user["roles"], user["firstname"], user["lastname"], user["email"])
+    except Exception:
+        pass
+
+    # store roles (normalize to list)
+    roles = user.get("roles") if isinstance(user, dict) else user["roles"]
+    if isinstance(roles, str):
+        roles_list = [r.strip() for r in roles.split(",") if r.strip()]
+    else:
+        roles_list = list(roles) if roles is not None else []
+
+    request.session["roles"] = roles_list
+    request.session["logged_in"] = True
+    request.session["is_admin"] = "admin" in roles_list
+
+    return {"status": "session_updated", "user": username, "roles": roles_list}
 
 def logout_s(request: Request):
     try:

@@ -29,8 +29,11 @@ def init_middleware(app: Any) -> None:
 def get_session_data(request: Request) -> Dict[str, Any]:
     return request.session
 
-def set_session_data(request: Request, username: str, roles: str):
+def set_session_data(request: Request, username: str, roles: str, firstname: str, lastname: str, email: str) -> None:
     request.session["username"] = username
+    request.session["firstname"] = firstname
+    request.session["lastname"] = lastname
+    request.session["email"] = email
     request.session["roles"] = roles
 
 def clear_session(request: Request):
