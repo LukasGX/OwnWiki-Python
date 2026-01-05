@@ -1,3 +1,4 @@
+import json
 import re
 from fastapi import Depends, FastAPI, HTTPException, Request, Path
 from fastapi.templating import Jinja2Templates
@@ -9,12 +10,13 @@ import db
 from colorama import init, Fore
 
 # import routers
-from api.v1.routers import articles, user, roles
+from api.v1.routers import articles, user, roles, rights
 
 # import services
 from services.article_service import return_article
 from services.roles_service import get_role_color, get_role_name
 from services.user_service import update_session
+from services.rights_service import get_rights_by_role
 
 # import middleware
 from sessions import init_middleware, get_session_data
@@ -41,6 +43,7 @@ init_middleware(app)
 app.include_router(articles.router, prefix="/api/v1/articles", tags=["articles"])
 app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
 app.include_router(roles.router, prefix="/api/v1/roles", tags=["roles"])
+app.include_router(rights.router, prefix="/api/v1/rights", tags=["rights"])
 
 app.mount("/css", StaticFiles(directory="css"), name="css")
 app.mount("/js", StaticFiles(directory="js"), name="js") 
@@ -50,8 +53,24 @@ app.mount("/resources", StaticFiles(directory="resources"), name="resources")
 app.mount("/pages", StaticFiles(directory="pages"), name="pages")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
 templates = Jinja2Templates(directory="templates")
+
+def get_user_rights(request: Request):
+    user_rights = {}
+    for role in request.session.get("roles", [])[0].split(";"):
+        rights = get_rights_by_role(role)
+        for right, value in rights.items():
+            user_rights[right] = value
+
+    # fill missing rights with False
+    with open("static/rightlist.json", "r", encoding="utf-8") as f:
+        all_rights = json.load(f)
+
+    for right in all_rights:
+        if right not in user_rights:
+            user_rights[right] = False
+
+    return user_rights
 
 @app.get("/")
 async def root():
@@ -105,6 +124,18 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
     else:
         is_admin = False
 
+    user_rights = get_user_rights(request)
+    needed_right = "read"
+
+    if needed_right not in user_rights or not user_rights[needed_right]:
+        p = f"{page}/edit"
+
+        request.session["redirect_data"] = {
+            "page": p,
+            "right": needed_right
+        }
+        return RedirectResponse(url="/403", status_code=302)
+
     context = {
         "request": request,
         "title": data["title"],
@@ -116,14 +147,12 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
         "protected": data["protected"],
         "needed_right": needed_right,
         "page": page,
-        "permissions": {
-            "edit": True
-        },
+        "permissions": user_rights,
     }
     return templates.TemplateResponse("read.html", context)
 
 @app.get("/account", response_class=HTMLResponse)
-async def wiki_page(request: Request, conn = Depends(connect_db)):
+async def account_page(request: Request, conn = Depends(connect_db)):
     update_session(request, request.session.get("username", ""), conn)
 
     session = get_session_data(request)
@@ -167,10 +196,7 @@ async def wiki_page(request: Request, conn = Depends(connect_db)):
         "is_admin": is_admin,
         "roles": (roles or rolesr),
         "role_colors": role_colors,
-        "role_names": role_names,
-        "permissions": {
-            "edit": True
-        },
+        "role_names": role_names
     }
     return templates.TemplateResponse("account.html", context)
 
@@ -190,6 +216,8 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
     else:
         logged_in = False
 
+    user_rights = get_user_rights(request)
+
     # get needed right
     if data["protected"] == "none":
         needed_right = "edit"
@@ -201,6 +229,15 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
         needed_right = "editsuperprotected"
     else:
         needed_right = "edit" # fallback
+
+    if needed_right not in user_rights or not user_rights[needed_right]:
+        p = f"{page}/edit"
+
+        request.session["redirect_data"] = {
+            "page": p,
+            "right": needed_right
+        }
+        return RedirectResponse(url="/403", status_code=302)
 
     if "admin" in session:
         is_admin = True
@@ -220,8 +257,19 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
         "protected": data["protected"],
         "needed_right": needed_right,
         "page": page,
-        "permissions": {
-            "edit": True
-        },
+        "permissions": user_rights
     }
     return templates.TemplateResponse("edit.html", context)
+
+@app.get("/403", response_class=HTMLResponse)
+async def forbidden_page(request: Request):
+    redirect_data = request.session.get("redirect_data", {})
+    page = redirect_data.get("page")
+    right = redirect_data.get("right", "unbekannt")
+
+    context = {
+        "request": request,
+        "page": page,
+        "right": right
+    }
+    return templates.TemplateResponse("403.html", context)

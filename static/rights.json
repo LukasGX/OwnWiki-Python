@@ -1,0 +1,73 @@
+{
+	"default": {
+		"read": true,
+		"createaccount": true
+	},
+	"user": {
+		"edit": true,
+		"applytags": true,
+		"sendemail": true,
+		"editmyoptions": true,
+		"editmyprivateinfo": true,
+		"editmywatchlist": true,
+		"viewmyprivateinfo": true,
+		"viewmywatchlist": true
+	},
+	"autoconfirmed": {
+		"createpage": true,
+		"creatediscussion": true,
+		"editsemiprotected": true,
+		"minoredit": true,
+		"upload": true,
+		"uploadbyurl": true,
+		"editcontentmodel": true,
+		"pagelang": true,
+		"export": true,
+		"autoconfirmed": true
+	},
+	"bot": {
+		"import": true,
+		"higherapilimits": true,
+		"bot": true,
+		"suppressredirect": true
+	},
+	"admin": {
+		"editprotected": true,
+		"move": true,
+		"movefile": true,
+		"reupload": true,
+		"delete": true,
+		"bigdelete": true,
+		"block": true,
+		"blockemail": true,
+		"browsedeleted": true,
+		"protect": true,
+		"rollback": true,
+		"undelete": true,
+		"deletetags": true,
+		"import": true,
+		"managetags": true,
+		"higherapilimits": true,
+		"ipblockbypass": true,
+		"suppressredirect": true
+	},
+	"interface-admin": {
+		"editinterface": true,
+		"editsitecss": true,
+		"editsitejs": true,
+		"editsuperprotected": true
+	},
+	"bureaucrat": {
+		"userrights": true,
+		"renameusers": true
+	},
+	"oversighter": {
+		"deletelogentry": true,
+		"deletehistory": true,
+		"hideuser": true,
+		"suppressionlog": true,
+		"supresshistory": true,
+		"viewsuppressed": true,
+		"renameusers": true
+	}
+}

@@ -544,42 +544,7 @@ button.wide {
 	margin-bottom: 1rem;
 }
 
-/* Error 403 */
-.err403 {
-	background-color: rgba(255, 0, 0, 0.3);
-	padding: 3rem;
-	border: 4px solid #690a03;
-	border-radius: 16px;
-
-	width: fit-content;
-
-	font-size: 1.1rem;
-	color: #690a03;
-
-	margin-bottom: 1rem;
-}
-
-.err403 > span {
-	display: block;
-	max-width: 21vw;
-	text-align: center;
-}
-
-.err403 .lock-symbol {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	margin-bottom: 1.5rem;
-}
-
-.err403 .lock-symbol i {
-	font-size: 11rem;
-	color: #690a03;
-}
-
 /* tf-indicator */
-
 .tf-indicator {
 	display: inline-block;
 	border-radius: 10px;
@@ -807,4 +772,37 @@ p.email {
 	border-radius: 8px;
 
 	margin-bottom: 1rem;
+}
+
+.err403 {
+	background-color: rgba(255, 0, 0, 0.3);
+	padding: 3rem;
+	border: 4px solid #690a03;
+	border-radius: 16px;
+
+	width: fit-content;
+
+	font-size: 1.1rem;
+	color: #690a03;
+
+	margin-bottom: 1rem;
+}
+
+.err403 > span {
+	display: block;
+	max-width: 21vw;
+	text-align: center;
+}
+
+.err403 .lock-symbol {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	margin-bottom: 1.5rem;
+}
+
+.err403 .lock-symbol i {
+	font-size: 11rem;
+	color: #690a03;
 }
