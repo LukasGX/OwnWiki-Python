@@ -96,23 +96,25 @@
 					{% if controls %}
 					<div class="titlebar">
 						<div class="group">
-							<span class="element active"
-								><i class="fas fa-file"></i> Artikel</span
-							>
-							<span class="element"
-								><i class="fas fa-comment"></i> Diskussion</span
-							>
-							<span class="element"
-								><i class="far fa-star"></i
-							></span>
+							<span class="element active">
+								<i class="fas fa-file"></i> Artikel
+							</span>
+							<span class="element">
+								<a href="/wiki/{{ page }}/discussion">
+									<i class="fas fa-comment"></i> Diskussion
+								</a>
+							</span>
+							<span class="element">
+								<i class="far fa-star"></i>
+							</span>
 						</div>
 						<div class="group">
 							{% if permissions[needed_right] %}
-							<span class="element"
-								><a href="/wiki/{{ page }}/edit"
-									><i class="fas fa-pen"></i> Bearbeiten</a
-								></span
-							>
+							<span class="element">
+								<a href="/wiki/{{ page }}/edit">
+									<i class="fas fa-pen"></i> Bearbeiten
+								</a>
+							</span>
 							{% else %}
 							<span class="element"
 								><i class="fas fa-code"></i> Quelltext

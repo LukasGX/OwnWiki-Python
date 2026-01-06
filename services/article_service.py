@@ -34,6 +34,21 @@ def return_article(namespace: str, name: str, raw: bool = False):
         "protected": json_content.get("protected", "none")
     }
 
+def return_discussion(namespace: str, name: str):
+    json_path = PAGES_DIR / f"{namespace}/{name}_discussion.json"
+    
+    # check both paths
+    if not json_path.exists():
+        return {"found": False}
+    
+    # open safely
+    json_content = json.loads(json_path.read_text(encoding="utf-8"))
+
+    return {
+        "content": json_content,
+        "found": True
+    }
+
 def save_article(namespace: str, name: str, content: str):
     md_path = PAGES_DIR / f"{namespace}/{name}.md"
     

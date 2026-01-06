@@ -13,7 +13,7 @@ from colorama import init, Fore
 from api.v1.routers import articles, user, roles, rights
 
 # import services
-from services.article_service import return_article
+from services.article_service import return_article, return_discussion
 from services.roles_service import get_role_color, get_role_name
 from services.user_service import update_session
 from services.rights_service import get_rights_by_role
@@ -260,6 +260,60 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
         "permissions": user_rights
     }
     return templates.TemplateResponse("edit.html", context)
+
+@app.get("/wiki/{page}/discussion", response_class=HTMLResponse)
+async def discussion_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
+    if ":" not in page:
+        raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
+    
+    update_session(request, request.session.get("username", ""), conn)
+
+    splitted = page.split(":")
+    data = return_discussion(splitted[0], splitted[1])
+    articledata = return_article(splitted[0], splitted[1])
+
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+
+    user_rights = get_user_rights(request)
+    existing = data["found"]
+
+    # get needed right
+    if existing:
+        needed_right = "edit"
+    else:
+        needed_right = "creatediscussion"
+
+    if needed_right not in user_rights or not user_rights[needed_right]:
+        p = f"{page}/edit"
+
+        request.session["redirect_data"] = {
+            "page": p,
+            "right": needed_right
+        }
+        return RedirectResponse(url="/403", status_code=302)
+
+    if "admin" in session:
+        is_admin = True
+    else:
+        is_admin = False
+
+    context = {
+        "request": request,
+        "content": "", # to be implemented
+        "title": f"{articledata['title']} - Diskussion",
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous"),
+        "is_admin": is_admin,
+        "needed_right": needed_right,
+        "page": page,
+        "existing": existing,
+        "permissions": user_rights
+    }
+    return templates.TemplateResponse("discussion.html", context)
 
 @app.get("/403", response_class=HTMLResponse)
 async def forbidden_page(request: Request):
