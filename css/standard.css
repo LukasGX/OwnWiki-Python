@@ -806,3 +806,70 @@ p.email {
 	font-size: 11rem;
 	color: #690a03;
 }
+
+/* Discussion */
+.chat {
+	background-color: rgba(0, 0, 0, 0.03);
+	border: 1px solid #cccccc;
+	border-radius: 8px;
+
+	margin-bottom: 1rem;
+}
+
+.chat-header {
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 8px 8px 0 0;
+	padding: 1rem;
+}
+
+.chat-closed,
+.chat-marked,
+.chat-resolved,
+.chat-open {
+	font-weight: bold;
+	font-size: 0.7rem;
+	display: block;
+}
+
+.chat-closed {
+	color: #c70000;
+}
+
+.chat-marked {
+	color: #cb9c00;
+}
+
+.chat-resolved {
+	color: #1d871a;
+}
+
+.chat-open {
+	color: #2a2cfe;
+}
+
+.chat-title {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
+.chat-messages {
+	padding: 0.4rem;
+}
+
+.message {
+	background-color: #ffffff;
+	border: 1px solid #cccccc;
+	border-radius: 8px;
+	padding: 0.5rem 1rem;
+	margin-bottom: 0.5rem;
+}
+
+.message-user {
+	color: rgba(0, 0, 0, 0.3);
+	font-size: 0.8rem;
+}
+
+.message-content {
+	font-size: 1rem;
+	display: block;
+}

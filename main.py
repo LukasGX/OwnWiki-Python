@@ -1,3 +1,5 @@
+from datetime import datetime
+from babel.dates import format_datetime
 import json
 import re
 from fastapi import Depends, FastAPI, HTTPException, Request, Path
@@ -71,6 +73,21 @@ def get_user_rights(request: Request):
             user_rights[right] = False
 
     return user_rights
+
+def parse_chat(content: list) -> list:
+    for item in content:
+        for message in item["messages"]:
+            ts = message["timestamp"]
+            if ts.endswith("Z"):
+                iso_ts = ts[:-1] + "+00:00"
+            else:
+                iso_ts = ts
+                
+            dt = datetime.fromisoformat(iso_ts)
+            message["formatted_time"] = dt.strftime("%d.%m.%Y, %H:%M")
+    
+    return content
+
 
 @app.get("/")
 async def root():
@@ -301,9 +318,11 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
     else:
         is_admin = False
 
+    content = parse_chat(data["content"])
+
     context = {
         "request": request,
-        "content": "", # to be implemented
+        "content": content,
         "title": f"{articledata['title']} - Diskussion",
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),

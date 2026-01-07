@@ -128,7 +128,50 @@
 							>
 						</div>
 					</div>
-					{% if existing %} ... {% else %}
+					{% if existing %} {% for chat in content %}
+					<div class="chat">
+						<div class="chat-header">
+							<span class="chat-title">{{ chat.title }}</span>
+							{% if chat.status == "closed" %}
+							<span class="chat-closed">
+								<i class="fas fa-xmark"></i> Geschlossen
+							</span>
+							{% elif chat.status == "marked" %}
+							<span class="chat-marked">
+								<i class="fas fa-exclamation"></i> Markiert
+							</span>
+							{% elif chat.status == "marked-auto" %}
+							<span class="chat-marked">
+								<i class="fas fa-exclamation"></i> Automatisch
+								markiert
+							</span>
+							{% elif chat.status == "resolved" %}
+							<span class="chat-resolved">
+								<i class="fas fa-check"></i> Erledigt
+							</span>
+							{% else %}
+							<span class="chat-open">
+								<i
+									class="fas fa-hourglass-end fa-flip-vertical"></i>
+								Offen
+							</span>
+							{% endif %}
+						</div>
+						<div class="chat-messages">
+							{% for message in chat.messages %}
+							<div class="message">
+								<span class="message-user">
+									{{ message.user }} &middot; {{
+									message.formatted_time }}
+								</span>
+								<span class="message-content">
+									{{ message.content }}
+								</span>
+							</div>
+							{% endfor %}
+						</div>
+					</div>
+					{% endfor %} {% else %}
 					<p>Zu dieser Seite gibt es noch keine Diskussion.</p>
 					<button>Jetzt erstellen</button>
 					{% endif %}
