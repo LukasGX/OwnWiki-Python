@@ -59,7 +59,7 @@ templates = Jinja2Templates(directory="templates")
 
 def get_user_rights(request: Request):
     user_rights = {}
-    for role in request.session.get("roles", [])[0].split(";"):
+    for role in request.session.get("roles", ["default"])[0].split(";"):
         rights = get_rights_by_role(role)
         for right, value in rights.items():
             user_rights[right] = value

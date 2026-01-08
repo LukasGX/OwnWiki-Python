@@ -1,9 +1,15 @@
-import hashlib
 import json
 from fastapi import Request, status
 from fastapi.responses import RedirectResponse
 from api.v1.deps import connect_db
 from sessions import set_session_data, clear_session
+from argon2 import PasswordHasher
+
+ph = PasswordHasher()
+
+def get_encrypted(input: str):
+    hashed = ph.hash(input)
+    return hashed
 
 def login_s(request: Request, username: str, password: str, redirect: str, conn):
     cursor = conn.cursor()
@@ -13,11 +19,11 @@ def login_s(request: Request, username: str, password: str, redirect: str, conn)
     if user is None:
         return {"error": "Invalid username or password"}
     
-    pw_hash = password.encode('utf-8')
-    pw_hash = hashlib.sha256(pw_hash).hexdigest()
-
-    if pw_hash != user["password_hash"]:
+    try:
+        ph.verify(user["password_hash"], password)
+    except:
         return {"error": "Invalid username or password"}
+
 
     # create session data
     try:
