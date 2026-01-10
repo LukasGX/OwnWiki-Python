@@ -318,7 +318,10 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
     else:
         is_admin = False
 
-    content = parse_chat(data["content"])
+    if existing:
+        content = parse_chat(data["content"])
+    else:
+        content = ""
 
     context = {
         "request": request,
