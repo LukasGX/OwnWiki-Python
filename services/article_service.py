@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from helper.gethtml import get_html
 from fastapi import HTTPException
@@ -63,3 +64,29 @@ def save_article(namespace: str, name: str, content: str):
     md_path.write_text(content, encoding="utf-8")
     
     return {"status": "success", "message": f"Article '{namespace}:{name}' saved successfully."}
+
+def create_article_s(namespace: str, name: str, title: str, content: str):
+    md_path = PAGES_DIR / f"{namespace}/{name}.md"
+    json_path = PAGES_DIR / f"{namespace}/{name}.json"
+    ns_path = PAGES_DIR / namespace
+
+    # check ns
+    if not os.path.isdir(ns_path):
+        raise HTTPException(status_code=400, detail="Wrong namespace")
+
+    if md_path.exists():
+        raise HTTPException(status_code=409, detail="Page already existing")
+    
+    if json_path.exists():
+        raise HTTPException(status_code=409, detail="Page already existing")
+    
+    # checks for content
+    # later ...
+
+    with open(md_path, "x") as f:
+        f.write(content)
+
+    with open(json_path, "x") as f:
+        f.write(json.dumps({"title": title, "noControls": False, "protected": "none"}, indent=4))
+
+    return {"status": "success", "message": f"Article '{namespace}:{name}' created successfully."}

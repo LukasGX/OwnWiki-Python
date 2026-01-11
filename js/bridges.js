@@ -65,6 +65,41 @@ function saveFile() {
 		});
 }
 
+function createFile() {
+	const content = document.getElementById("content").value;
+	const title = document.getElementById("title").value;
+	const splitPage = PAGE.split(":");
+	const namespace = splitPage[0];
+	const name = splitPage[1];
+	fetch("/api/v1/articles/create", {
+		method: "PUT",
+		credentials: "same-origin",
+		headers: {
+			"Content-Type": "application/json",
+			Accept: "application/json"
+		},
+		body: JSON.stringify({
+			namespace: namespace,
+			name: name,
+			title: title,
+			content: content
+		})
+	})
+		.then((response) => {
+			if (response.ok) {
+				return response.text();
+			} else {
+				throw new Error("Creating failed.");
+			}
+		})
+		.then(() => {
+			window.location.href = `/wiki/${namespace}:${name}`;
+		})
+		.catch((error) => {
+			console.error(error);
+		});
+}
+
 const previewBtn = document.getElementById("update-preview");
 if (previewBtn) {
 	previewBtn.addEventListener("click", (event) => {
@@ -78,5 +113,13 @@ if (saveBtn) {
 	saveBtn.addEventListener("click", (event) => {
 		event.preventDefault();
 		saveFile();
+	});
+}
+
+const createBtn = document.getElementById("create");
+if (createBtn) {
+	createBtn.addEventListener("click", (event) => {
+		event.preventDefault();
+		createFile();
 	});
 }

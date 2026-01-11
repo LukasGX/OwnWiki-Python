@@ -282,6 +282,58 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
     }
     return templates.TemplateResponse("edit.html", context)
 
+@app.get("/wiki/{page}/create", response_class=HTMLResponse)
+async def edit_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
+    if ":" not in page:
+        raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
+    
+    update_session(request, request.session.get("username", ""), conn)
+
+    splitted = page.split(":")
+    data = return_article(splitted[0], splitted[1], True)
+
+    error = data.get("error")
+    if error is None or not error == "404":
+        return RedirectResponse(url=f"/wiki/{page}/edit", status_code=302)
+
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+
+    user_rights = get_user_rights(request)
+
+    # get needed right
+    needed_right = "createpage"
+
+    if needed_right not in user_rights or not user_rights[needed_right]:
+        p = f"{page}/edit"
+
+        request.session["redirect_data"] = {
+            "page": p,
+            "right": needed_right
+        }
+        return RedirectResponse(url="/403", status_code=302)
+
+    if "admin" in session:
+        is_admin = True
+    else:
+        is_admin = False
+
+    context = {
+        "request": request,
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous"),
+        "is_admin": is_admin,
+        "controls": True,
+        "protected": "none",
+        "needed_right": needed_right,
+        "page": page,
+        "permissions": user_rights
+    }
+    return templates.TemplateResponse("create.html", context)
+
 @app.get("/wiki/{page}/discussion", response_class=HTMLResponse)
 async def discussion_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
     if ":" not in page:

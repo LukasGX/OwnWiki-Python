@@ -900,3 +900,7 @@ p.email {
 	font-size: 1rem;
 	display: block;
 }
+
+#content {
+	resize: vertical !important;
+}

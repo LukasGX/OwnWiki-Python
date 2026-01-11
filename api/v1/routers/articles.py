@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body
 from pydantic import BaseModel
 from api.v1.deps import get_api_key
-from services.article_service import return_article, return_discussion, save_article
+from services.article_service import return_article, return_discussion, save_article, create_article_s
 from helper.gethtml import get_html
 
 router = APIRouter()
@@ -26,3 +26,13 @@ class ArticleSave(BaseModel):
 @router.patch("/save")
 async def edit_article(data: ArticleSave = Body(...)):
     return save_article(data.namespace, data.name, data.content)
+
+class ArticleCreate(BaseModel):
+    namespace: str
+    name: str
+    title: str
+    content: str
+
+@router.put("/create")
+async def create_article(data: ArticleCreate = Body(...)):
+    return create_article_s(data.namespace, data.name, data.title, data.content)
