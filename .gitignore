@@ -1,0 +1,9 @@
+__pycache__/
+.venv/
+font-awesome/
+fonts/Montserrat/
+fonts/OpenSans/
+fonts/Parkinsans/
+fonts/Roboto/
+fonts/SourceSans3/
+.env
