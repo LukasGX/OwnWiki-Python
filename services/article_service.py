@@ -11,9 +11,9 @@ def return_article(namespace: str, name: str, raw: bool = False):
     
     # check both paths
     if not json_path.exists():
-        raise HTTPException(404, f"Article '{namespace}:{name}' not found")
+        return {"error": "404"}
     if not md_path.exists():
-        raise HTTPException(404, f"Markdown content for '{namespace}:{name}' missing")
+        return {"error": "404"}
     
     # open safely
     json_content = json.loads(json_path.read_text(encoding="utf-8"))

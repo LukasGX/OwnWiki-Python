@@ -116,6 +116,12 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
     splitted = page.split(":")
     data = return_article(splitted[0], splitted[1])
 
+    error = data.get("error")
+    if error is not None and error == "404":
+        request.session["redirect_data"] = {"page": page}
+        return RedirectResponse(url="/404", status_code=302)
+
+
     session = get_session_data(request)
     if "username" in session:
         logged_in = True
@@ -145,10 +151,8 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
     needed_right = "read"
 
     if needed_right not in user_rights or not user_rights[needed_right]:
-        p = f"{page}/edit"
-
         request.session["redirect_data"] = {
-            "page": p,
+            "page": page,
             "right": needed_right
         }
         return RedirectResponse(url="/403", status_code=302)
@@ -236,16 +240,16 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
     user_rights = get_user_rights(request)
 
     # get needed right
-    if data["protected"] == "none":
-        needed_right = "edit"
-    elif data["protected"] == "semiprotected":
-        needed_right = "editsemiprotected"
-    elif data["protected"] == "protected":
-        needed_right = "editprotected"
-    elif data["protected"] == "superprotected":
-        needed_right = "editsuperprotected"
+    if logged_in and splitted[0] == "user":
+        if session["username"] == splitted[1]: needed_right = "edit"
+        else: needed_right = "editprotected"
     else:
-        needed_right = "edit" # fallback
+        match data["protected"]:
+            case "none": needed_right = "edit"
+            case "semiprotected": needed_right = "editsemiprotected"
+            case "protected": needed_right = "editprotected"
+            case "superprotected": needed_right = "editsuperprotected"
+            case _: needed_right = "edit"
 
     if needed_right not in user_rights or not user_rights[needed_right]:
         p = f"{page}/edit"
@@ -349,3 +353,14 @@ async def forbidden_page(request: Request):
         "right": right
     }
     return templates.TemplateResponse("403.html", context)
+
+@app.get("/404", response_class=HTMLResponse)
+async def forbidden_page(request: Request):
+    redirect_data = request.session.get("redirect_data", {})
+    page = redirect_data.get("page")
+
+    context = {
+        "request": request,
+        "page": page
+    }
+    return templates.TemplateResponse("404.html", context)

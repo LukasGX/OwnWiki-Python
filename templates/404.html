@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>OwnWiki</title>
+
+		<link rel="stylesheet" href="/fonts/fonts.css" />
+		<link rel="stylesheet" href="/font-awesome/css/all.css" />
+		<link rel="stylesheet" href="/css/standard.css" />
+		<link
+			rel="shortcut icon"
+			href="/static/favicon.ico"
+			type="image/x-icon" />
+	</head>
+	<body>
+		<div class="header">
+			<img
+				src="/resources/ownwiki-logo-mini.png"
+				class="side-logo"
+				alt="OwnWiki Logo" />
+			<input
+				type="text"
+				name="search"
+				placeholder="OwnWiki durchsuchen"
+				class="search-bar" />
+			<div class="user-menu">
+				<i class="fas fa-bell icon"></i>
+			</div>
+		</div>
+
+		<div class="msplit">
+			<div class="side">
+				<img
+					src="/resources/ownwiki-logo.png"
+					class="side-logo"
+					alt="OwnWiki Logo" />
+				<div class="side-links">
+					{% if logged_in %}
+					<!-- logged in -->
+					<span class="h">{{ username }}</span>
+					<span><a href="/account">Mein Konto</a></span>
+					<span><a href="#" onclick="logout()">Abmelden</a></span>
+					{% else %}
+					<!-- not logged in -->
+					<span><a href="/login">Anmelden</a></span>
+					<span><a href="/register">Konto erstellen</a></span>
+					{% endif %}
+				</div>
+				<div class="side-links">
+					<span class="h">Navigation</span>
+					<span><a href="/wiki/main:main">Hauptseite</a></span>
+					<span><a href="#">Zufällige Seite</a></span>
+					<span><a href="#">Logbücher</a></span>
+					<span><a href="#">Spezialseiten</a></span>
+				</div>
+				<div class="side-links">
+					{% if is_admin %}
+					<!-- is admin -->
+					<span class="h">Werkzeuge</span>
+					<span
+						><a href="?f=special:permanent&t=[[TITLE]]"
+							>Permanenter Link</a
+						></span
+					>
+					<span
+						><a href="?f=special:move&t=[[TITLE]]"
+							>Verschieben</a
+						></span
+					>
+					<span
+						><a href="?f=special:delete&t=[[TITLE]]"
+							>Löschen</a
+						></span
+					>
+					<span
+						><a href="?f=special:protect&t=[[TITLE]]"
+							>Schützen</a
+						></span
+					>
+					{% else %}
+					<!-- is not admin -->
+					<span class="h">Werkzeuge</span>
+					<span
+						><a href="?f=special:permanent&t=[[TITLE]]"
+							>Permanenter Link</a
+						></span
+					>
+					{% endif %}
+				</div>
+			</div>
+
+			<div class="content-wrapper">
+				<div class="content">
+					<h1 class="page_title">Seite nicht gefunden</h1>
+					<div class="err404">
+						<span>
+							Die angeforderte Seite ({{ page }}) wurde nicht
+							gefunden.
+						</span>
+						<a href="/wiki/{{ page }}/create" class="c">
+							<button class="create">Jetzt erstellen</button>
+						</a>
+					</div>
+				</div>
+
+				<div id="poweredby">
+					<img
+						src="/resources/ownwiki-logo-mini.png"
+						alt="OwnWiki Logo" />
+					<p>Powered by<br />OwnWiki</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- jquery -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<!-- select2 -->
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css"
+			rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+		<!-- flatpickr -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+		<!-- own scripts -->
+		<script src="/js/sel2.js"></script>
+		<script src="/js/codehighlight.js"></script>
+		<script src="/js/manipulate_datetime.js"></script>
+		<script src="/js/bridges.js"></script>
+	</body>
+</html>
