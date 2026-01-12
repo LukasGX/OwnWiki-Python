@@ -161,14 +161,15 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
         "request": request,
         "title": data["title"],
         "content": data["content"],
-        "logged_in": logged_in,
-        "username": session.get("username", "Anonymous"),
-        "is_admin": is_admin,
         "controls": data["noControls"] == False,
         "protected": data["protected"],
         "needed_right": needed_right,
-        "page": page,
         "permissions": user_rights,
+
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous"),
+        "is_admin": is_admin,
+        "page": page
     }
     return templates.TemplateResponse("read.html", context)
 
@@ -192,6 +193,7 @@ async def account_page(request: Request, conn = Depends(connect_db)):
         roles = rolesr[0].split(";")
     else:
         is_admin = False
+        roles = rolesr[0].split(";")
 
     # role colors
     role_colors = {}
@@ -209,15 +211,16 @@ async def account_page(request: Request, conn = Depends(connect_db)):
 
     context = {
         "request": request,
-        "logged_in": logged_in,
-        "username": session.get("username", "Anonymous"),
         "firstname": session.get("firstname", ""),
         "lastname": session.get("lastname", ""),
         "email": session.get("email", ""),
         "is_admin": is_admin,
         "roles": (roles or rolesr),
         "role_colors": role_colors,
-        "role_names": role_names
+        "role_names": role_names,
+
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous")
     }
     return templates.TemplateResponse("account.html", context)
 
@@ -271,14 +274,15 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
         "request": request,
         "title": data["title"],
         "content": content,
-        "logged_in": logged_in,
-        "username": session.get("username", "Anonymous"),
-        "is_admin": is_admin,
         "controls": data["noControls"] == False,
         "protected": data["protected"],
         "needed_right": needed_right,
+        "permissions": user_rights,
+
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous"),
+        "is_admin": is_admin,
         "page": page,
-        "permissions": user_rights
     }
     return templates.TemplateResponse("edit.html", context)
 
@@ -323,14 +327,15 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
 
     context = {
         "request": request,
-        "logged_in": logged_in,
-        "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
         "controls": True,
         "protected": "none",
         "needed_right": needed_right,
         "page": page,
-        "permissions": user_rights
+        "permissions": user_rights,
+
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous")
     }
     return templates.TemplateResponse("create.html", context)
 
@@ -383,13 +388,14 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
         "request": request,
         "content": content,
         "title": f"{articledata['title']} - Diskussion",
+        "needed_right": needed_right,
+        "existing": existing,
+        "permissions": user_rights,
+
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
-        "needed_right": needed_right,
-        "page": page,
-        "existing": existing,
-        "permissions": user_rights
+        "page": page
     }
     return templates.TemplateResponse("discussion.html", context)
 
@@ -399,20 +405,38 @@ async def forbidden_page(request: Request):
     page = redirect_data.get("page")
     right = redirect_data.get("right", "unbekannt")
 
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+
     context = {
         "request": request,
         "page": page,
-        "right": right
+        "right": right,
+
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous")
     }
     return templates.TemplateResponse("403.html", context)
 
 @app.get("/404", response_class=HTMLResponse)
 async def forbidden_page(request: Request):
-    redirect_data = request.session.get("redirect_data", {})
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+
+    redirect_data = session.get("redirect_data", {})
     page = redirect_data.get("page")
 
     context = {
         "request": request,
-        "page": page
+        "page": page,
+
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous")
     }
     return templates.TemplateResponse("404.html", context)

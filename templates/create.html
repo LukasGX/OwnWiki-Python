@@ -45,64 +45,10 @@
 					class="side-logo"
 					alt="OwnWiki Logo" />
 				<div class="side-links">
-					{% if logged_in %}
-					<!-- logged in -->
-					<span class="h">{{ username }}</span>
-					<span><a href="#" onclick="logout()">Abmelden</a></span>
-					{% else %}
-					<!-- not logged in -->
-					<span><a href="/login">Anmelden</a></span>
-					<span><a href="/register">Konto erstellen</a></span>
-					{% endif %}
+					{% include '/sidebar/user.html' with context %}
 				</div>
 				<div class="side-links">
-					<span class="h">Navigation</span>
-					<span><a href="/wiki/main:main">Hauptseite</a></span>
-					<span
-						><a href="?f=special:randompage"
-							>Zufällige Seite</a
-						></span
-					>
-					<span><a href="?f=special:logs">Logbücher</a></span>
-					<span
-						><a href="?f=special:specialpages"
-							>Spezialseiten</a
-						></span
-					>
-				</div>
-				<div class="side-links">
-					{% if is_admin %}
-					<!-- is admin -->
-					<span class="h">Werkzeuge</span>
-					<span
-						><a href="?f=special:permanent&t=[[TITLE]]"
-							>Permanenter Link</a
-						></span
-					>
-					<span
-						><a href="?f=special:move&t=[[TITLE]]"
-							>Verschieben</a
-						></span
-					>
-					<span
-						><a href="?f=special:delete&t=[[TITLE]]"
-							>Löschen</a
-						></span
-					>
-					<span
-						><a href="?f=special:protect&t=[[TITLE]]"
-							>Schützen</a
-						></span
-					>
-					{% else %}
-					<!-- is not admin -->
-					<span class="h">Werkzeuge</span>
-					<span
-						><a href="?f=special:permanent&t=[[TITLE]]"
-							>Permanenter Link</a
-						></span
-					>
-					{% endif %}
+					{% include '/sidebar/fastnav.html' with context %}
 				</div>
 			</div>
 

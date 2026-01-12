@@ -1,0 +1,12 @@
+{% if is_admin %}
+<!-- is admin -->
+<span class="h">Werkzeuge</span>
+<span><a href="/wiki/{{ page }}/permanent">Permanenter Link</a></span>
+<span><a href="/wiki/{{ page }}/move">Verschieben</a></span>
+<span><a href="/wiki/{{ page }}/delete">Löschen</a></span>
+<span><a href="/wiki/{{ page }}/protect">Schützen</a></span>
+{% else %}
+<!-- is not admin -->
+<span class="h">Werkzeuge</span>
+<span><a href="/wiki/{{ page }}/permanent">Permanenter Link</a></span>
+{% endif %}

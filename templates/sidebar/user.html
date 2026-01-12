@@ -1,0 +1,10 @@
+{% if logged_in %}
+<!-- logged in -->
+<span class="h">{{ username }}</span>
+<span><a href="/account">Mein Konto</a></span>
+<span><a href="#" onclick="logout()">Abmelden</a></span>
+{% else %}
+<!-- not logged in -->
+<span><a href="/login">Anmelden</a></span>
+<span><a href="/register">Konto erstellen</a></span>
+{% endif %}
