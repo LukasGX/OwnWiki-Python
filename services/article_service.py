@@ -90,3 +90,35 @@ def create_article_s(namespace: str, name: str, title: str, content: str):
         f.write(json.dumps({"title": title, "noControls": False, "protected": "none"}, indent=4))
 
     return {"status": "success", "message": f"Article '{namespace}:{name}' created successfully."}
+
+def protect_article_s(namespace: str, name: str, protected: str):
+    json_path = PAGES_DIR / f"{namespace}/{name}.json"
+
+    if not json_path.exists():
+        raise HTTPException(404, f"Article '{namespace}:{name}' not found")
+    
+    protection_states = ["none", "semiprotected", "protected", "superprotected"]
+
+    if not protected in protection_states:
+        raise HTTPException(status_code=422, detail="Invalid protection state")
+    
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    data["protected"] = protected
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+    return {"status": "success", "message": f"Article '{namespace}:{name}' protected successfully."}
+
+def return_protection_status(namespace: str, name: str):
+    json_path = PAGES_DIR / f"{namespace}/{name}.json"
+
+    if not json_path.exists():
+        raise HTTPException(404, f"Article '{namespace}:{name}' not found")
+    
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    return {"status": data.get("protected", "none")}

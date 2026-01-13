@@ -212,8 +212,17 @@ button {
 	transition: 225ms ease;
 }
 
-input[type="submit"]:hover,
-button:hover {
+input[type="submit"]:disabled,
+button:disabled {
+	cursor: default;
+}
+
+button.highlighted {
+	background-color: #9394ff;
+}
+
+input[type="submit"]:not(:disabled):hover,
+button:not(:disabled):hover {
 	background-color: #575afd;
 }
 

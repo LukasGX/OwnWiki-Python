@@ -252,8 +252,8 @@ const previewButton = document.querySelector(".preview-button");
 const previewOutput = document.querySelector(".code-preview");
 const saveButton = document.querySelector(".save-button");
 
-if (previewBtn) {
-	previewBtn.addEventListener("click", async function () {
+if (previewButton) {
+	previewButton.addEventListener("click", async function () {
 		previewOutput.innerHTML = "<p>Loading...</p>";
 
 		const codeContent = textareaElement.value;
@@ -367,43 +367,111 @@ if (saveButton) {
 
 // blocking
 const blockBtn = document.getElementById("block-btn");
-blockBtn.addEventListener("click", async function () {
-	console.log("executing!!!");
+if (blockBtn) {
+	blockBtn.addEventListener("click", async function () {
+		console.log("executing!!!");
 
-	const meId = ME_ID;
-	const target = document.getElementById("target").value;
-	const scope = $("#scope").val();
-	const optCreateAccounts =
-		document.getElementById("optCreateAccounts").value;
-	const optSendEmails = document.getElementById("optSendEmails").value;
-	const optOwnDiscussion = document.getElementById("optOwnDiscussion").value;
-	const durationUntil = document.getElementById("datetimePicker").value;
-	const reason = document.getElementById("reason").value;
+		const meId = ME_ID;
+		const target = document.getElementById("target").value;
+		const scope = $("#scope").val();
+		const optCreateAccounts =
+			document.getElementById("optCreateAccounts").value;
+		const optSendEmails = document.getElementById("optSendEmails").value;
+		const optOwnDiscussion =
+			document.getElementById("optOwnDiscussion").value;
+		const durationUntil = document.getElementById("datetimePicker").value;
+		const reason = document.getElementById("reason").value;
 
-	console.log(durationUntil);
+		console.log(durationUntil);
 
-	const response = await fetch("backend/blockAPI.php", {
-		method: "POST",
+		const response = await fetch("backend/blockAPI.php", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				target: target,
+				scope: scope,
+				optCreateAccounts: optCreateAccounts,
+				optSendEmails: optSendEmails,
+				optOwnDiscussion: optOwnDiscussion,
+				durationUntil: durationUntil,
+				reason: reason,
+				meId: meId
+			})
+		});
+
+		const data = await response.json();
+
+		if (data.success) {
+			// window.location.href = "?f=special:allusers";
+		} else {
+			console.error("Error while blocking user");
+		}
+	});
+}
+
+async function changeProtection(ns, name, protection) {
+	await fetch("/api/v1/articles/protect", {
+		method: "PATCH",
 		headers: {
 			"Content-Type": "application/json"
 		},
 		body: JSON.stringify({
-			target: target,
-			scope: scope,
-			optCreateAccounts: optCreateAccounts,
-			optSendEmails: optSendEmails,
-			optOwnDiscussion: optOwnDiscussion,
-			durationUntil: durationUntil,
-			reason: reason,
-			meId: meId
+			namespace: ns,
+			name: name,
+			protected: protection
 		})
 	});
 
-	const data = await response.json();
+	window.location.reload();
+}
 
-	if (data.success) {
-		// window.location.href = "?f=special:allusers";
-	} else {
-		console.error("Error while blocking user");
-	}
-});
+const protectLink = document.getElementById("protect_link");
+if (protectLink) {
+	const page_split = PAGE.split(":");
+	const ns = page_split[0];
+	const name = page_split[1];
+
+	let status;
+
+	fetch(`/api/v1/articles/${ns}/${name}/protection`)
+		.then((response) => {
+			return response.json();
+		})
+		.then((data) => {
+			status = data.status;
+		})
+		.catch((error) => {
+			console.error("Fehler:", error);
+		});
+
+	protectLink.addEventListener("click", () => {
+		openModal(
+			`
+		<h2>Schutzstatus ändern</h2>
+		<button
+			${status == "none" ? `class="highlighted" disabled` : ""}
+			onclick="changeProtection('${ns}', '${name}', 'none')">
+			Ungeschützt
+		</button>
+		<button
+			${status == "semiprotected" ? `class="highlighted" disabled` : ""}
+			onclick="changeProtection('${ns}', '${name}', 'semiprotected')">
+			Nur für automatisch bestätigte Nutzer
+		</button>
+		<button
+			${status == "protected" ? `class="highlighted" disabled` : ""}
+			onclick="changeProtection('${ns}', '${name}', 'protected')">
+			Nur für Admins
+		</button>
+		<button
+			${status == "superprotected" ? `class="highlighted" disabled` : ""}
+			onclick="changeProtection('${ns}', '${name}', 'superprotected')">
+			Nur für Systemadmins
+		</button>
+		`,
+			true
+		);
+	});
+}
