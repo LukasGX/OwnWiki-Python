@@ -83,7 +83,12 @@
 							>
 						</div>
 					</div>
-					{% endif %} {{ content | safe }}
+					{% endif %} {% if deleted == True %}
+					<div class="deleted">
+						Diese Seite wurde von {{ deluser }} gelöscht.
+					</div>
+					{% endif %} {% if show == True %} {{ content | safe }} {%
+					endif %}
 				</div>
 
 				<div id="poweredby">

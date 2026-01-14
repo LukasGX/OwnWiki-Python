@@ -1,0 +1,9 @@
+{
+	"title": "EXAMPLE_TITLE",
+	"noControls": false,
+	"protected": "none | semiprotected | protected | superprotected",
+	"deleted": false,
+	"deletionInfo": {
+		"user": "EXAMPLE_USER"
+	}
+}

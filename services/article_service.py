@@ -32,7 +32,11 @@ def return_article(namespace: str, name: str, raw: bool = False):
         "content": toReturn,
         "title": json_content["title"],
         "noControls": json_content.get("noControls", False),
-        "protected": json_content.get("protected", "none")
+        "protected": json_content.get("protected", "none"),
+        "deleted": json_content.get("deleted", False),
+        "deletionInfo": {
+            "user": json_content.get("deletionInfo", {}).get("user", "")
+        }
     }
 
 def return_discussion(namespace: str, name: str):

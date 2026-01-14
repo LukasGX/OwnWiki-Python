@@ -1,3 +1,9 @@
 {
-	"title": "Schnelllöschantrag (SLA)"
+	"title": "Schnelllöschantrag (SLA)",
+	"noControls": false,
+	"protected": "none",
+	"deleted": false,
+	"deletionInfo": {
+		"user": ""
+	}
 }

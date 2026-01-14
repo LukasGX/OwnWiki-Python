@@ -156,15 +156,27 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
             "right": needed_right
         }
         return RedirectResponse(url="/403", status_code=302)
+    
+    if data["deleted"] == True:
+        if user_rights["browsedeleted"] == True:
+            show = True
+        else: show = False
+    else:
+        show = True
+    
+    content = data["content"]
 
     context = {
         "request": request,
         "title": data["title"],
-        "content": data["content"],
+        "content": content,
         "controls": data["noControls"] == False,
         "protected": data["protected"],
         "needed_right": needed_right,
         "permissions": user_rights,
+        "deleted": data["deleted"],
+        "deluser": data["deletionInfo"]["user"],
+        "show": show,
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
@@ -243,7 +255,9 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
     user_rights = get_user_rights(request)
 
     # get needed right
-    if logged_in and splitted[0] == "user":
+    if data["deleted"] == True:
+        needed_right = "browsedeleted"
+    elif logged_in and splitted[0] == "user":
         if session["username"] == splitted[1]: needed_right = "edit"
         else: needed_right = "editprotected"
     else:
@@ -360,13 +374,15 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
     existing = data["found"]
 
     # get needed right
-    if existing:
-        needed_right = "edit"
+    if articledata["deleted"] == True:
+        needed_right = "browsedeleted"
+    elif existing:
+        needed_right = "read"
     else:
         needed_right = "creatediscussion"
 
     if needed_right not in user_rights or not user_rights[needed_right]:
-        p = f"{page}/edit"
+        p = f"{page}/discussion"
 
         request.session["redirect_data"] = {
             "page": p,

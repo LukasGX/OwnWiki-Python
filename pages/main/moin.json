@@ -1,4 +1,9 @@
 {
-    "title": "Moin",
-    "protected": "protected"
+	"title": "Moin",
+	"noControls": false,
+	"protected": "protected",
+	"deleted": true,
+	"deletionInfo": {
+		"user": "admin"
+	}
 }

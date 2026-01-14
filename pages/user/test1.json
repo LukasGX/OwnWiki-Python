@@ -1,3 +1,7 @@
 {
-	"title": "Benutzer: test1"
+	"title": "Benutzer: test1",
+	"deleted": false,
+	"deletionInfo": {
+		"user": ""
+	}
 }

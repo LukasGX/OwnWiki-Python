@@ -1,3 +1,7 @@
 {
-	"title": "Benutzer: admin"
+	"title": "Benutzer: admin",
+	"deleted": false,
+	"deletionInfo": {
+		"user": ""
+	}
 }

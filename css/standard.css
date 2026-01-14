@@ -642,6 +642,7 @@ button.wide {
 }
 
 .flatpickr-time input[type="number"] {
+	appearance: textfield !important;
 	-moz-appearance: textfield !important;
 }
 
@@ -841,6 +842,20 @@ p.email {
 
 .err404 .create:hover {
 	background-color: #970f05;
+}
+
+.deleted {
+	background-color: rgba(255, 0, 0, 0.3);
+	padding: 1rem;
+	border: 4px solid #690a03;
+	border-radius: 16px;
+
+	width: fit-content;
+
+	font-size: 1.1rem;
+	color: #690a03;
+
+	margin-bottom: 1rem;
 }
 
 /* Discussion */
