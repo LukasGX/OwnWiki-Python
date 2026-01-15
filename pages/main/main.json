@@ -1,9 +1,9 @@
 {
-	"title": "Hauptseite",
-	"noControls": false,
-	"protected": "superprotected",
-	"deleted": "false",
-	"deletionInfo": {
-		"user": ""
-	}
+    "title": "Hauptseite",
+    "noControls": false,
+    "protected": "superprotected",
+    "deleted": "false",
+    "deletionInfo": {
+        "user": ""
+    }
 }

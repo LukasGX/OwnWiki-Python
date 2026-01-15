@@ -91,16 +91,25 @@ def parse_chat(content: list) -> list:
 
 @app.get("/")
 async def root():
+    """
+    Root is not supported, will give 404
+    """
     raise HTTPException(status_code=404, detail="Not found")
 
 @app.get("/whoami")
 async def whoami(request: Request, conn = Depends(connect_db)):
+    """
+    Short overview of what data is known about the logged in user.
+    """
     update_session(request, request.session.get("username", ""), conn)
     session = get_session_data(request)
     return {"username": session.get("username", "Anonymous")}
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
+    """
+    The OwnWiki login page.
+    """
     context = {
         "request": request
     }
@@ -108,6 +117,9 @@ async def login_page(request: Request):
 
 @app.get("/wiki/{page}", response_class=HTMLResponse)
 async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
+    """
+    The page where you can view any page in the wiki.
+    """
     if ":" not in page:
         raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
     
@@ -187,6 +199,9 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
 
 @app.get("/account", response_class=HTMLResponse)
 async def account_page(request: Request, conn = Depends(connect_db)):
+    """
+    Overview your account.
+    """
     update_session(request, request.session.get("username", ""), conn)
 
     session = get_session_data(request)
@@ -238,6 +253,9 @@ async def account_page(request: Request, conn = Depends(connect_db)):
 
 @app.get("/wiki/{page}/edit", response_class=HTMLResponse)
 async def edit_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
+    """
+    Edit any page in the wiki.
+    """
     if ":" not in page:
         raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
     
@@ -301,7 +319,10 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
     return templates.TemplateResponse("edit.html", context)
 
 @app.get("/wiki/{page}/create", response_class=HTMLResponse)
-async def edit_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
+async def create_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
+    """
+    Create a new page in the wiki.
+    """
     if ":" not in page:
         raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
     
@@ -355,6 +376,9 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
 
 @app.get("/wiki/{page}/discussion", response_class=HTMLResponse)
 async def discussion_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
+    """
+    View any page discussion.
+    """
     if ":" not in page:
         raise HTTPException(400, f"Invalid page format '{page}'. Use 'namespace:name' format.")
     
@@ -417,6 +441,9 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
 
 @app.get("/403", response_class=HTMLResponse)
 async def forbidden_page(request: Request):
+    """
+    Is shown if you don't have sufficient rights to access the requested page.
+    """
     redirect_data = request.session.get("redirect_data", {})
     page = redirect_data.get("page")
     right = redirect_data.get("right", "unbekannt")
@@ -438,7 +465,10 @@ async def forbidden_page(request: Request):
     return templates.TemplateResponse("403.html", context)
 
 @app.get("/404", response_class=HTMLResponse)
-async def forbidden_page(request: Request):
+async def page_not_found(request: Request):
+    """
+    Is shown if the requested page is not found.
+    """
     session = get_session_data(request)
     if "username" in session:
         logged_in = True

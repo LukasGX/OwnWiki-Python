@@ -463,12 +463,12 @@ if (protectLink) {
 		<button
 			${status == "protected" ? `class="highlighted" disabled` : ""}
 			onclick="changeProtection('${ns}', '${name}', 'protected')">
-			Nur für Admins
+			Nur für Administratoren
 		</button>
 		<button
 			${status == "superprotected" ? `class="highlighted" disabled` : ""}
 			onclick="changeProtection('${ns}', '${name}', 'superprotected')">
-			Nur für Systemadmins
+			Nur für UI-Administratoren
 		</button>
 		`,
 			true
