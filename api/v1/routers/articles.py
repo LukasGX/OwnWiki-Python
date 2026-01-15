@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body
 from pydantic import BaseModel
 from api.v1.deps import get_api_key
-from services.article_service import return_article, return_discussion, save_article, create_article_s, protect_article_s, return_protection_status
+from services.article_service import return_article, return_discussion, save_article, create_article_s, protect_article_s, return_protection_status, delete_article_s, restore_article_s, return_deletion_status
 from helper.gethtml import get_html
 
 router = APIRouter()
@@ -36,6 +36,27 @@ class ArticleCreate(BaseModel):
 @router.put("/create")
 async def create_article(data: ArticleCreate = Body(...)):
     return create_article_s(data.namespace, data.name, data.title, data.content)
+
+class ArticleDelete(BaseModel):
+    namespace: str
+    name: str
+    deletedBy: str
+
+@router.patch("/delete")
+async def delete_article(data: ArticleDelete = Body(...)):
+    return delete_article_s(data.namespace, data.name, data.deletedBy)
+
+@router.get("/{namespace}/{name}/deleted")
+async def is_deleted(namespace: str, name: str):
+    return return_deletion_status(namespace, name)
+
+class ArticleRestore(BaseModel):
+    namespace: str
+    name: str
+
+@router.patch("/restore")
+async def restore_article(data: ArticleRestore = Body(...)):
+    return restore_article_s(data.namespace, data.name)
 
 class ArticleProtect(BaseModel):
     namespace: str

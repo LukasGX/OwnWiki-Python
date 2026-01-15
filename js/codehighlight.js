@@ -475,3 +475,49 @@ if (protectLink) {
 		);
 	});
 }
+
+async function changeDeletion(ns, name, statusNow) {
+	const method = statusNow ? "restore" : "delete";
+	await fetch(`/api/v1/articles/${method}`, {
+		method: "PATCH",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			namespace: ns,
+			name: name,
+			deletedBy: USER
+		})
+	});
+
+	window.location.reload();
+}
+
+const deleteLink = document.getElementById("delete_link");
+if (deleteLink) {
+	const page_split = PAGE.split(":");
+	const ns = page_split[0];
+	const name = page_split[1];
+
+	let status;
+
+	fetch(`/api/v1/articles/${ns}/${name}/deleted`)
+		.then((response) => {
+			return response.json();
+		})
+		.then((data) => {
+			status = data.status;
+			deleteLink.textContent = status ? "Wiederherstellen" : "Löschen";
+		})
+		.catch((error) => {
+			console.error("Fehler:", error);
+		});
+
+	deleteLink.addEventListener("click", () => {
+		const word = status ? "wiederherstellen" : "löschen";
+		openModal(`
+			<h2>Seite ${word}</h2>
+			<button onclick="changeDeletion('${ns}', '${name}', ${status})">Jetzt ${word}</button>
+		`);
+	});
+}

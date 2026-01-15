@@ -1,9 +1,9 @@
 {
-	"title": "Moin",
-	"noControls": false,
-	"protected": "protected",
-	"deleted": true,
-	"deletionInfo": {
-		"user": "admin"
-	}
+    "title": "Moin",
+    "noControls": false,
+    "protected": "protected",
+    "deleted": true,
+    "deletionInfo": {
+        "user": "admin"
+    }
 }

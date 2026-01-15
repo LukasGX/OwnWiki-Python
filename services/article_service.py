@@ -95,6 +95,52 @@ def create_article_s(namespace: str, name: str, title: str, content: str):
 
     return {"status": "success", "message": f"Article '{namespace}:{name}' created successfully."}
 
+def delete_article_s(namespace: str, name: str, deletedBy: str):
+    json_path = PAGES_DIR / f"{namespace}/{name}.json"
+
+    if not json_path.exists():
+        raise HTTPException(404, f"Article '{namespace}:{name}' not found")
+    
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    data["deleted"] = True
+    data["deletionInfo"] = {
+        "user": deletedBy
+    }
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+    return {"status": "success", "message": f"Article '{namespace}:{name}' deleted successfully."}
+
+def return_deletion_status(namespace: str, name: str):
+    json_path = PAGES_DIR / f"{namespace}/{name}.json"
+
+    if not json_path.exists():
+        raise HTTPException(404, f"Article '{namespace}:{name}' not found")
+    
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    return {"status": data.get("deleted", False)}
+
+def restore_article_s(namespace: str, name: str):
+    json_path = PAGES_DIR / f"{namespace}/{name}.json"
+
+    if not json_path.exists():
+        raise HTTPException(404, f"Article '{namespace}:{name}' not found")
+    
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    data["deleted"] = False
+
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+    return {"status": "success", "message": f"Article '{namespace}:{name}' restored successfully."}
+
 def protect_article_s(namespace: str, name: str, protected: str):
     json_path = PAGES_DIR / f"{namespace}/{name}.json"
 
