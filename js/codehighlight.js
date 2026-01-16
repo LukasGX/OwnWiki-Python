@@ -521,3 +521,46 @@ if (deleteLink) {
 		`);
 	});
 }
+
+async function movePage(ns, name) {
+	const newNS = document.getElementById("new_ns_input").value;
+	const newName = document.getElementById("new_name_input").value;
+	const redirection = document.getElementById(
+		"create_redirection_input"
+	).checked;
+
+	await fetch(`/api/v1/articles/move`, {
+		method: "PATCH",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			namespace: ns,
+			name: name,
+			newNamespace: newNS,
+			newName: newName,
+			createRedirection: redirection
+		})
+	});
+
+	window.location.reload();
+}
+
+const moveLink = document.getElementById("move_link");
+if (moveLink) {
+	const page_split = PAGE.split(":");
+	const ns = page_split[0];
+	const name = page_split[1];
+
+	moveLink.addEventListener("click", () => {
+		openModal(`
+			<h2>Seite verschieben</h2>
+			Ziel:
+			<input type="text" id="new_ns_input" value="${ns}" />
+			<input type="text" id="new_name_input" value="${name}" />
+			<input type="checkbox" id="create_redirection_input" checked />
+			<label for="create_redirection_input">Weiterleitung erstellen</label><br /><br />
+			<button onclick="movePage('${ns}', '${name}')">Jetzt verschieben</button>
+		`);
+	});
+}

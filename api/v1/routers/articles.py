@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body
 from pydantic import BaseModel
 from api.v1.deps import get_api_key
-from services.article_service import return_article, return_discussion, save_article, create_article_s, protect_article_s, return_protection_status, delete_article_s, restore_article_s, return_deletion_status
+from services.article_service import return_article, return_discussion, save_article, create_article_s, protect_article_s, return_protection_status, delete_article_s, restore_article_s, return_deletion_status, move_article_s
 from helper.gethtml import get_html
 
 router = APIRouter()
@@ -70,3 +70,14 @@ async def protect_article(data: ArticleProtect = Body(...)):
 @router.get("/{namespace}/{name}/protection")
 async def protection(namespace: str, name: str):
     return return_protection_status(namespace, name)
+
+class ArticleMove(BaseModel):
+    namespace: str
+    name: str
+    newNamespace: str
+    newName: str
+    createRedirection: bool = True
+
+@router.patch("/move")
+async def move_article(data: ArticleMove = Body(...)):
+    return move_article_s(data.namespace, data.name, data.newNamespace, data.newName, data.createRedirection)

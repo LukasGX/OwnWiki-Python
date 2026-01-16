@@ -69,20 +69,23 @@ def save_article(namespace: str, name: str, content: str):
     
     return {"status": "success", "message": f"Article '{namespace}:{name}' saved successfully."}
 
-def create_article_s(namespace: str, name: str, title: str, content: str):
+def create_article_s(namespace: str, name: str, title: str, content: str, throw: bool = True):
     md_path = PAGES_DIR / f"{namespace}/{name}.md"
     json_path = PAGES_DIR / f"{namespace}/{name}.json"
     ns_path = PAGES_DIR / namespace
 
     # check ns
     if not os.path.isdir(ns_path):
-        raise HTTPException(status_code=400, detail="Wrong namespace")
+        if throw: raise HTTPException(status_code=400, detail="Wrong namespace")
+        else: return {"error": "Wrong namespace"}
 
     if md_path.exists():
-        raise HTTPException(status_code=409, detail="Page already existing")
+        if throw: raise HTTPException(status_code=409, detail="Page already existing")
+        else: return {"error": "Page already existing"}
     
     if json_path.exists():
-        raise HTTPException(status_code=409, detail="Page already existing")
+        if throw: raise HTTPException(status_code=409, detail="Page already existing")
+        else: return {"error": "Page already existing"}
     
     # checks for content
     # later ...
@@ -91,7 +94,7 @@ def create_article_s(namespace: str, name: str, title: str, content: str):
         f.write(content)
 
     with open(json_path, "x") as f:
-        f.write(json.dumps({"title": title, "noControls": False, "protected": "none"}, indent=4))
+        f.write(json.dumps({"title": title, "noControls": False, "protected": "none", "deleted": False, "deletionInfo": {"user": ""}}, indent=4))
 
     return {"status": "success", "message": f"Article '{namespace}:{name}' created successfully."}
 
@@ -172,3 +175,32 @@ def return_protection_status(namespace: str, name: str):
         data = json.load(f)
 
     return {"status": data.get("protected", "none")}
+
+def move_article_s(ns: str, name: str, newNS: str, newName: str, createRedirection: bool):
+    md_path = PAGES_DIR / f"{ns}/{name}.md"
+    json_path = PAGES_DIR / f"{ns}/{name}.json"
+    ns_path = PAGES_DIR / ns
+
+    # check ns
+    if not os.path.isdir(ns_path):
+        raise HTTPException(status_code=400, detail="Wrong namespace")
+
+    if not md_path.exists():
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    if not json_path.exists():
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    data = return_article(ns, name, True)
+    content = data.get("content", "")
+    title = data.get("title", "")
+    
+    if createRedirection == True:
+        save_article(ns, name, f"$$REDIRECT:{newNS}:{newName}$$")
+    
+    success = create_article_s(newNS, newName, title, content, False)
+    if not success.get("error", None) == None:
+        save_article(ns, name, content)
+        return {"error": f"{success.get("error", "")} while creating {newNS}:{newName}"}
+    
+    return {"status": "success", "message": f"Article '{ns}:{name}' moved successfully into '{newNS}:{newName}'."}

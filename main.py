@@ -178,6 +178,12 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
     
     content = data["content"]
 
+    match = re.search(r'\$\$REDIRECT:([^:]+):([^:]+)\$\$', content)
+
+    if match:
+        ns, name = match.groups()
+        return RedirectResponse(url=f"/wiki/{ns}:{name}", status_code=302)
+
     context = {
         "request": request,
         "title": data["title"],
