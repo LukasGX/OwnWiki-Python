@@ -240,6 +240,7 @@ button:not(:disabled):hover {
 	color: #000000;
 	border: 1px solid #c70000;
 }
+
 .extDeleteButton:hover,
 .deleteButton:hover {
 	background-color: #c70000 !important;
@@ -255,6 +256,12 @@ input[type="submit"].wide,
 button.wide {
 	padding-left: 3rem;
 	padding-right: 3rem;
+}
+
+input[type="submit"].small,
+button.small {
+	padding: 0.2rem 0.7rem;
+	border-radius: 12px;
 }
 
 .codeh {
@@ -733,6 +740,10 @@ button.wide {
 	margin: 0;
 }
 
+.actions {
+	margin-top: 1rem;
+}
+
 p.username {
 	font-weight: bold;
 	font-size: 1.2rem;
@@ -754,6 +765,12 @@ p.email {
 	margin-left: 0.4rem;
 }
 
+p.roles {
+	display: flex !important;
+	flex-wrap: wrap;
+	/* gap: 0.3rem; */
+}
+
 .role {
 	font-family: "SourceSans3", sans-serif !important;
 	background-color: rgba(0, 0, 0, 0.1);
@@ -762,6 +779,13 @@ p.email {
 	border-radius: 8px;
 	font-size: 0.92rem;
 	margin-right: 0.3rem;
+	cursor: default;
+
+	transition: 225ms ease;
+}
+
+.role:hover {
+	transform: translateY(-20%);
 }
 
 .public-info {

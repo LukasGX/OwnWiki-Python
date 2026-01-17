@@ -257,6 +257,89 @@ async def account_page(request: Request, conn = Depends(connect_db)):
     }
     return templates.TemplateResponse("account.html", context)
 
+@app.get("/users", response_class=HTMLResponse)
+async def all_users(request: Request, conn = Depends(connect_db)):
+    """
+    List of all users.
+    """
+    update_session(request, request.session.get("username", ""), conn)
+
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+
+    rolesr: list = request.session.get("roles", [])
+    try:
+        roless = rolesr[0].split(";")
+    except:
+        roless = ["default"]
+
+    if len(rolesr) > 0 and "admin" in roless: is_admin = True
+    else: is_admin = False
+
+    user_rights = get_user_rights(request)
+
+    users = []
+
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT username, firstname, roles 
+        FROM users 
+        ORDER BY id 
+        LIMIT 50
+    """)
+
+    for row in cursor.fetchall():
+        username, firstname, roles_str = row
+        
+        roles = [r.strip() for r in roles_str.split(';') if r.strip()]
+        
+        users.append({
+            "username": username,
+            "firstname": firstname,
+            "roles": roles
+        })
+
+    conn.close()
+
+    # role colors
+    role_colors = {
+        "admin": "#FFC8C8",
+        "interface-admin": "#FFC8C8",
+        "bureaucrat": "#FFC8C8",
+        "oversighter": "#FFC8C8",
+        "ownwiki-admin": "#FF8686",
+        "bot": "#C3C3FF"
+    }
+
+    # role names
+    role_names = {
+        "default": "Standard",
+        "user": "Benutzer",
+        "autoconfirmed": "Automatisch bestätigt",
+        "bot": "Bot",
+        "admin": "Administrator",
+        "interface-admin": "UI-Administrator",
+        "bureaucrat": "Bürokrat",
+        "oversighter": "Oversighter",
+        "ownwiki-admin": "OwnWiki-Administrator"
+    }
+
+    context = {
+        "request": request,
+        "is_admin": is_admin,
+        "role_colors": role_colors,
+        "role_names": role_names,
+
+        "permissions": user_rights,
+
+        "logged_in": logged_in,
+        "users": users
+    }
+    return templates.TemplateResponse("users.html", context)
+
 @app.get("/wiki/{page}/edit", response_class=HTMLResponse)
 async def edit_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):
     """

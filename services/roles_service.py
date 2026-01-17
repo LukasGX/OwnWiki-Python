@@ -4,7 +4,7 @@ def get_role_color(role: str):
         "interface-admin": "#FFC8C8",
         "bureaucrat": "#FFC8C8",
         "oversighter": "#FFC8C8",
-        "ownwiki-admin": "#FFC8C8",
+        "ownwiki-admin": "#FF8686",
         "bot": "#C3C3FF"
     }
     return role_colors.get(role, "rgba(0, 0, 0, 0.1)")
