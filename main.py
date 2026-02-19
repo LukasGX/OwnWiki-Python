@@ -17,7 +17,7 @@ from api.v1.routers import articles, user, roles, rights
 # import services
 from services.article_service import return_article, return_discussion
 from services.roles_service import get_role_color, get_role_name
-from services.user_service import update_session
+from services.user_service import update_session, get_roles_s
 from services.rights_service import get_rights_by_role
 
 # import middleware
@@ -159,6 +159,14 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
     else:
         is_admin = False
 
+    if splitted[0] == "user":
+        try:
+            user_roles = get_roles_s(splitted[1])
+        except:
+            user_roles = []
+    else:
+        user_roles = []
+
     user_rights = get_user_rights(request)
     needed_right = "read"
 
@@ -195,6 +203,8 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
         "deleted": data["deleted"],
         "deluser": data["deletionInfo"]["user"],
         "show": show,
+        "ns": splitted[0],
+        "user_roles": user_roles,
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),

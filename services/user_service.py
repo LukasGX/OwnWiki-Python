@@ -1,4 +1,5 @@
 import json
+import sqlite3
 from fastapi import Request, status
 from fastapi.responses import RedirectResponse
 from api.v1.deps import connect_db
@@ -82,3 +83,24 @@ def logout_s(request: Request):
     except Exception:
         pass
     return {"status": "logged_out"}
+
+def get_roles_s(username: str):
+    conn = sqlite3.connect("data/ownwiki.db", check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT roles FROM users WHERE username = ?", (username,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row is None:
+        return {"error": "User not found"}
+
+    roles = row["roles"] if isinstance(row, (dict, sqlite3.Row)) else row[0]
+
+    roles_list = []
+    if roles is None:
+        roles_list = []
+    else:
+        roles_list = roles.split(";")
+
+    return {"user": username, "roles": roles_list}

@@ -1,12 +1,16 @@
-{% if is_admin %}
-<!-- is admin -->
+<!-- new approach: modular -->
 <span class="h">Werkzeuge</span>
 <span><a href="/wiki/{{ page }}/permanent">Permanenter Link</a></span>
+{% if permissions["move"] %}
 <span><a href="#" id="move_link">Verschieben</a></span>
+{% endif %} {% if permissions["delete"] %}
 <span><a href="#" id="delete_link">Löschen</a></span>
+{% endif %} {% if permissions["protect"] %}
 <span><a href="#" id="protect_link">Schützen</a></span>
-{% else %}
-<!-- is not admin -->
-<span class="h">Werkzeuge</span>
-<span><a href="/wiki/{{ page }}/permanent">Permanenter Link</a></span>
 {% endif %}
+<!-- user part -->
+{% if ns == "user" %} {% if permissions["userrights"] %}
+<span><a href="#" id="userrights_link">Benutzerrechte verwalten</a></span>
+{% endif %} {% if permissions["renameusers"] %}
+<span><a href="#" id="">Benutzer umbenennen</a></span>
+{% endif %} {% endif %}

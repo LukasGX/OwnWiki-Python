@@ -2,8 +2,8 @@
     "title": "Hauptseite",
     "noControls": false,
     "protected": "superprotected",
-    "deleted": "false",
+    "deleted": false,
     "deletionInfo": {
-        "user": ""
+        "user": "admin"
     }
 }
