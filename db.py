@@ -25,10 +25,22 @@ def init_db() -> None:
             roles TEXT NOT NULL
         );
     """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS api_keys (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            key_hash TEXT UNIQUE NOT NULL,
+            user_id INTEGER,
+            active BOOLEAN DEFAULT 1,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_used DATETIME,
+            usage_count INTEGER DEFAULT 0,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        );
+    """)
     
     conn.commit()
     
-    # Standard admin user (Password: admin123)
     try:
         cursor.execute(
             "INSERT INTO users (firstname, lastname, username, email, password_hash, roles) VALUES (?, ?, ?, ?, ?, ?)",

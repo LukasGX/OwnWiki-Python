@@ -1,8 +1,9 @@
+from typing import Dict, List
 from fastapi import APIRouter, Depends, Body
 from pydantic import BaseModel
-from api.v1.deps import get_api_key
 from services.article_service import return_article, return_discussion, save_article, create_article_s, protect_article_s, return_protection_status, delete_article_s, restore_article_s, return_deletion_status, move_article_s
 from helper.gethtml import get_html
+from api.v1.deps import protect
 
 router = APIRouter()
 
@@ -24,7 +25,7 @@ class ArticleSave(BaseModel):
     content: str
 
 @router.patch("/save")
-async def edit_article(data: ArticleSave = Body(...)):
+async def edit_article(data: ArticleSave = Body(...), user_roles: Dict[str, List[str]] = Depends(protect)):
     return save_article(data.namespace, data.name, data.content)
 
 class ArticleCreate(BaseModel):
