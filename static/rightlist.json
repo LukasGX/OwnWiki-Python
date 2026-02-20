@@ -49,5 +49,6 @@
 	"hideuser",
 	"suppressionlog",
 	"supresshistory",
-	"viewsuppressed"
+	"viewsuppressed",
+	"debug"
 ]

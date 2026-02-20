@@ -69,5 +69,8 @@
 		"supresshistory": true,
 		"viewsuppressed": true,
 		"renameusers": true
+	},
+	"ownwiki-admin": {
+		"debug": true
 	}
 }

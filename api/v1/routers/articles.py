@@ -3,20 +3,33 @@ from fastapi import APIRouter, Depends, Body
 from pydantic import BaseModel
 from services.article_service import return_article, return_discussion, save_article, create_article_s, protect_article_s, return_protection_status, delete_article_s, restore_article_s, return_deletion_status, move_article_s
 from helper.gethtml import get_html
-from api.v1.deps import protect
+from api.v1.deps import protect, protect_with_rights
 
 router = APIRouter()
 
+# Create protect dependencies with specific rights for OpenAPI compatibility
+protect_read = protect_with_rights(["read"])
+protect_edit = protect_with_rights(["edit"])
+protect_createpage = protect_with_rights(["createpage"])
+protect_delete = protect_with_rights(["delete"])
+protect_browsedeleted = protect_with_rights(["browsedeleted"])
+protect_undelete = protect_with_rights(["undelete"])
+protect_protect = protect_with_rights(["protect"])
+protect_move = protect_with_rights(["move"])
+
 @router.get("/{namespace}/{name}")
-async def get_article(namespace: str, name: str):
+async def get_article(namespace: str, name: str, user_roles: Dict[str, List[str]] = Depends(protect_read)):
+    """Required right: read"""
     return return_article(namespace, name)
 
 @router.get("/{namespace}/{name}/discussion")
-async def get_article_discussion(namespace: str, name: str):
+async def get_article_discussion(namespace: str, name: str, user_roles: Dict[str, List[str]] = Depends(protect_read)):
+    """Required right: read"""
     return return_discussion(namespace, name)
 
 @router.get("/preview")
-async def preview_article(md: str):
+async def preview_article(md: str, user_roles: Dict[str, List[str]] = Depends(protect_read)):
+    """Required right: read"""
     return get_html(md)
 
 class ArticleSave(BaseModel):
@@ -25,7 +38,8 @@ class ArticleSave(BaseModel):
     content: str
 
 @router.patch("/save")
-async def edit_article(data: ArticleSave = Body(...), user_roles: Dict[str, List[str]] = Depends(protect)):
+async def edit_article(data: ArticleSave = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_edit)):
+    """Required right: edit"""
     return save_article(data.namespace, data.name, data.content)
 
 class ArticleCreate(BaseModel):
@@ -35,7 +49,8 @@ class ArticleCreate(BaseModel):
     content: str
 
 @router.put("/create")
-async def create_article(data: ArticleCreate = Body(...)):
+async def create_article(data: ArticleCreate = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_createpage)):
+    """Required right: createpage"""
     return create_article_s(data.namespace, data.name, data.title, data.content)
 
 class ArticleDelete(BaseModel):
@@ -44,11 +59,13 @@ class ArticleDelete(BaseModel):
     deletedBy: str
 
 @router.patch("/delete")
-async def delete_article(data: ArticleDelete = Body(...)):
+async def delete_article(data: ArticleDelete = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_delete)):
+    """Required right: delete"""
     return delete_article_s(data.namespace, data.name, data.deletedBy)
 
 @router.get("/{namespace}/{name}/deleted")
-async def is_deleted(namespace: str, name: str):
+async def is_deleted(namespace: str, name: str, user_roles: Dict[str, List[str]] = Depends(protect_read)):
+    """Required right: read"""
     return return_deletion_status(namespace, name)
 
 class ArticleRestore(BaseModel):
@@ -56,7 +73,8 @@ class ArticleRestore(BaseModel):
     name: str
 
 @router.patch("/restore")
-async def restore_article(data: ArticleRestore = Body(...)):
+async def restore_article(data: ArticleRestore = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_undelete)):
+    """Required right: undelete"""
     return restore_article_s(data.namespace, data.name)
 
 class ArticleProtect(BaseModel):
@@ -65,11 +83,13 @@ class ArticleProtect(BaseModel):
     protected: str
 
 @router.patch("/protect")
-async def protect_article(data: ArticleProtect = Body(...)):
+async def protect_article(data: ArticleProtect = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_protect)):
+    """Required right: protect"""
     return protect_article_s(data.namespace, data.name, data.protected)
 
 @router.get("/{namespace}/{name}/protection")
-async def protection(namespace: str, name: str):
+async def protection(namespace: str, name: str, user_roles: Dict[str, List[str]] = Depends(protect_read)):
+    """Required right: read"""
     return return_protection_status(namespace, name)
 
 class ArticleMove(BaseModel):
@@ -80,5 +100,6 @@ class ArticleMove(BaseModel):
     createRedirection: bool = True
 
 @router.patch("/move")
-async def move_article(data: ArticleMove = Body(...)):
+async def move_article(data: ArticleMove = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_move)):
+    """Required right: move"""
     return move_article_s(data.namespace, data.name, data.newNamespace, data.newName, data.createRedirection)
