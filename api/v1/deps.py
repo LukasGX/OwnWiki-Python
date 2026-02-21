@@ -65,12 +65,14 @@ async def protect(
             detail="Login oder gültiger API-Key erforderlich"
         )
 
-    roles: List[str] = session.get("roles", [])
-    if not roles:
+    rolesr: List[str] = session.get("roles", [])
+    if not rolesr:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Keine Rollen in Session - Rechte unklar"
         )
+    
+    roles = rolesr[0].split(";")
 
     # Check required rights if specified
     if required_rights:

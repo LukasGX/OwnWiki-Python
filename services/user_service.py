@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from typing import Any, Dict
 from fastapi import Request, status
 from fastapi.responses import RedirectResponse
 from api.v1.deps import connect_db
@@ -104,3 +105,36 @@ def get_roles_s(username: str):
         roles_list = roles.split(";")
 
     return {"user": username, "roles": roles_list}
+
+def change_roles_s(username: str, roles_dict: Dict[str, bool]) -> Dict[str, Any]:
+    conn = sqlite3.connect("data/ownwiki.db", check_same_thread=False)
+    cursor = conn.cursor()
+    
+    try:
+        active_roles = [role for role, active in roles_dict.items() if active]
+        roles_string = ';'.join(active_roles)
+        
+        cursor.execute(
+            "UPDATE users SET roles = ? WHERE username = ?",
+            (roles_string, username)
+        )
+        
+        cursor.execute("SELECT id, roles FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        
+        if cursor.rowcount == 0:
+            return {"status": "error", "message": f"User '{username}' nicht gefunden"}
+        
+        conn.commit()
+        return {
+            "status": "success", 
+            "roles": roles_string,
+            "user_id": user[0]
+        }
+        
+    except sqlite3.Error as e:
+        conn.rollback()
+        return {"status": "error", "message": f"DB Fehler: {str(e)}"}
+    
+    finally:
+        conn.close()

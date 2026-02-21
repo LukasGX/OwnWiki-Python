@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Form, Request
+from pydantic import BaseModel
 from api.v1.deps import connect_db
-from services.user_service import get_encrypted, login_s, logout_s, get_roles_s
+from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s
 from api.v1.deps import protect, protect_with_rights
 from typing import Dict, List
 
@@ -8,6 +9,7 @@ router = APIRouter()
 
 protect_read = protect_with_rights(["read"])
 protect_debug = protect_with_rights(["debug"])
+protect_userrights = protect_with_rights(["userrights"])
 
 @router.post("/encrypt")
 async def encrypt(request: Request, input: str, user_roles: Dict[str, List[str]] = Depends(protect_debug)):
@@ -26,3 +28,16 @@ async def logout(request: Request):
 async def get_roles(request: Request, username: str, user_roles: Dict[str, List[str]] = Depends(protect_read)):
     """Required right: read"""
     return get_roles_s(username)
+
+class RoleUpdate(BaseModel):
+    roles: Dict[str, bool]
+
+@router.patch("/{username}/roles")
+async def change_roles(
+    username: str, 
+    role_data: RoleUpdate,
+    user_roles: Dict[str, List[str]] = Depends(protect_userrights)
+):
+    """Required right: userrights"""
+    roles_dict = role_data.roles
+    return change_roles_s(username, roles_dict)

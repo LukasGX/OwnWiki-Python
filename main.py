@@ -91,10 +91,7 @@ def parse_chat(content: list) -> list:
 
 @app.get("/")
 async def root():
-    """
-    Root is not supported, will give 404
-    """
-    raise HTTPException(status_code=404, detail="Not found")
+    return RedirectResponse(url="/wiki/main:main", status_code=302)
 
 @app.get("/whoami")
 async def whoami(request: Request, conn = Depends(connect_db)):

@@ -1,0 +1,11 @@
+[
+	"default",
+	"user",
+	"autoconfirmed",
+	"bot",
+	"admin",
+	"interface-admin",
+	"bureaucrat",
+	"oversighter",
+	"ownwiki-admin"
+]

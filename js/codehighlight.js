@@ -564,3 +564,80 @@ if (moveLink) {
 		`);
 	});
 }
+
+async function changeRoles(username, rolesObject) {
+	const roleData = {};
+
+	rolesObject.forEach((role) => {
+		const roleName = role.name || role.id || role;
+		const checkbox = document.querySelector(`input[name="${roleName}"]`);
+
+		if (checkbox) {
+			roleData[roleName] = checkbox.checked;
+		}
+	});
+
+	try {
+		const response = await fetch(`/api/v1/user/${username}/roles`, {
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				roles: roleData
+			})
+		});
+
+		window.location.reload();
+	} catch (error) {
+		console.error("Fehler:", error);
+	}
+}
+
+const userRolesLink = document.getElementById("user_roles_link");
+if (userRolesLink) {
+	const username = PAGE.split(":")[1];
+	const roles = USERROLES;
+
+	userRolesLink.addEventListener("click", async () => {
+		try {
+			const response = await fetch(`/static/roles.json`);
+			const jsonObject = await response.json();
+
+			let cleanRoles = roles.replace(/&#39;/g, '"');
+			const userData = JSON.parse(cleanRoles);
+			const userRolesArray = userData.roles || [];
+
+			let boxes = "";
+			jsonObject.forEach((role) => {
+				const checked = userRolesArray.includes(role.name || role);
+				boxes += `
+                    <input type="checkbox" name="${role.name || role}" id="role_${role.name || role}" 
+                           ${checked ? "checked" : ""} /> <label for="role_${role.name || role}">${role.name || role}</label><br />
+                `;
+			});
+
+			openModal(`
+                <h2>Benutzerrollen verwalten</h2>
+                ${boxes}<br />
+                <button id="saveRolesBtn" 
+                        data-username="${username}"
+                        data-roles='${JSON.stringify(jsonObject).replace(/'/g, "&#39;")}'>
+                    Jetzt Rollen ändern
+                </button>
+            `);
+
+			// ✅ EventListener nach Modal öffnen
+			document
+				.getElementById("saveRolesBtn")
+				.addEventListener("click", () => {
+					changeRoles(username, jsonObject);
+				});
+		} catch (error) {
+			console.error("Fehler:", error);
+			openModal(
+				"<h2>Fehler</h2><p>Rollen konnten nicht geladen werden.</p>"
+			);
+		}
+	});
+}
