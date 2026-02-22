@@ -12,7 +12,7 @@ import db
 from colorama import init, Fore
 
 # import routers
-from api.v1.routers import articles, user, roles, rights
+from api.v1.routers import articles, user, roles, rights, debug
 
 # import services
 from services.article_service import return_article, return_discussion
@@ -46,6 +46,7 @@ app.include_router(articles.router, prefix="/api/v1/articles", tags=["articles"]
 app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
 app.include_router(roles.router, prefix="/api/v1/roles", tags=["roles"])
 app.include_router(rights.router, prefix="/api/v1/rights", tags=["rights"])
+app.include_router(debug.router, prefix="/api/v1/debug", tags=["debug"])
 
 app.mount("/css", StaticFiles(directory="css"), name="css")
 app.mount("/js", StaticFiles(directory="js"), name="js") 
@@ -111,6 +112,16 @@ async def login_page(request: Request):
         "request": request
     }
     return templates.TemplateResponse("login.html", context)
+
+@app.get("/register", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """
+    The OwnWiki account creation page.
+    """
+    context = {
+        "request": request
+    }
+    return templates.TemplateResponse("register.html", context)
 
 @app.get("/wiki/{page}", response_class=HTMLResponse)
 async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn = Depends(connect_db)):

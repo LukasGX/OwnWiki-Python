@@ -1,0 +1,8 @@
+{
+	"uuid": "3fc1c47e-d7de-4b0c-a9d1-90086cdffc87",
+	"firstname": "Lukas",
+	"lastname": "Grambs",
+	"username": "test2",
+	"email": "lukas@grambs.info",
+	"pw_hash": "$argon2id$v=19$m=65536,t=3,p=4$6vUunGUx5ajJqNp4VSkGpw$2HChz+cuspsZM8RhQ0dDzIfUQswC+fkYRNWi+Znjauk"
+}

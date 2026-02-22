@@ -226,6 +226,30 @@ button:not(:disabled):hover {
 	background-color: #575afd;
 }
 
+input.valid {
+	border: 1px solid #00a857;
+}
+
+input.valid:hover,
+input.valid:focus {
+	border-color: #008243;
+	box-shadow: 0 0 5px rgba(6, 185, 0, 0.5);
+}
+
+input.invalid {
+	border: 1px solid #f20000;
+}
+
+input.invalid:hover,
+input.invalid:focus {
+	border-color: #f20000;
+	box-shadow: 0 0 5px rgba(243, 0, 0, 0.5);
+}
+
+.validation-error {
+	color: #ff1100;
+}
+
 .cancelButton {
 	background-color: rgba(199, 199, 199, 0.5);
 	color: #000000;
