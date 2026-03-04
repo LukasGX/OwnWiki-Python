@@ -1,9 +1,12 @@
+import base64
 import json
+import os
 import sqlite3
 from typing import Any, Dict
+import uuid
 from fastapi import Request, status
 from fastapi.responses import RedirectResponse
-from api.v1.deps import connect_db
+from api.v1.deps import connect_db, send_email
 from sessions import set_session_data, clear_session
 from argon2 import PasswordHasher
 
@@ -51,6 +54,90 @@ def login_s(request: Request, username: str, password: str, redirect: str, conn)
             status_code=status.HTTP_302_FOUND
         )
     return {"status": "logged_in", "user": username, "roles": roles_list}
+
+def register_s(request: Request, firstname: str, lastname: str, username: str, email: str, password: str, password_repeat: str, redirect: str, conn):
+    if password != password_repeat:
+        return {"error": "Passwords do not match"}
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    existing_user = cursor.fetchone()
+
+    if existing_user is not None:
+        return {"error": "Username already exists"}
+
+    password_hash = get_encrypted(password)
+
+    user_uuid = str(uuid.uuid4())
+
+    with open(f"registrations/{user_uuid}.json", "w") as f:
+        json.dump({
+            "uuid": user_uuid,
+            "firstname": firstname,
+            "lastname": lastname,
+            "username": username,
+            "email": email,
+            "password_hash": password_hash
+        }, f)
+
+    with open("resources/ownwiki-logo-mini.png", "rb") as image_file:
+        encoded = base64.b64encode(image_file.read()).decode('utf-8')
+
+    logo_src = f"data:image/png;base64,{encoded}"
+
+    with open("email_templates/registration.html", "r") as f:
+        email_body = f.read().format(
+            SITENAME="OwnWiki",
+            FIRSTNAME=firstname,
+            USERNAME=username,
+            ACTIVATION_LINK=f"http://localhost:8000/activate_account/{user_uuid}", # for now with localhost
+            SUPPORT_EMAIL="support@ownwiki.org",
+            YEAR=2026,
+            FOOTER_LINK="ownwiki.org",
+            LOGO_SRC=logo_src
+        )
+
+    send_email(
+        subject="OwnWiki Registrierung",
+        body=email_body,
+        recipients=[email]
+    )
+
+    return RedirectResponse(
+        url="/login",
+        status_code=status.HTTP_302_FOUND
+    )
+
+def activate_account_s(uuid: str, conn):
+    # check if uuid exists in registrations
+    try:
+        with open(f"registrations/{uuid}.json", "r") as f:
+            registration_data = json.load(f)
+    except FileNotFoundError:
+        return {"error": "Invalid activation link"}
+
+    # create user in database
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO users (username, password_hash, roles, firstname, lastname, email) VALUES (?, ?, ?, ?, ?, ?)", (
+            registration_data["username"],
+            registration_data["password_hash"],
+            "default;user",
+            registration_data["firstname"],
+            registration_data["lastname"],
+            registration_data["email"]
+        ))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return {"error": "Username or E-Mail already exists"}
+
+    # delete registration file
+    try:
+        os.remove(f"registrations/{uuid}.json")
+    except Exception:
+        pass
+
+    return RedirectResponse(url="/login?justActivated",status_code=302)
 
 def update_session(request: Request, username: str, conn):
     cursor = conn.cursor()

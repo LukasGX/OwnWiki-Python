@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 	<head>
 		<meta charset="UTF-8" />
@@ -43,6 +43,12 @@
 			<div class="content-wrapper">
 				<div class="content">
 					<h1 class="page_title">Bei OwnWiki anmelden</h1>
+					{% if just_activated %}
+					<p class="success-message">
+						Dein Konto wurde erfolgreich aktiviert! Du kannst dich
+						jetzt anmelden.
+					</p>
+					{% endif %}
 					<form action="/api/v1/user/login" method="post">
 						<input type="hidden" name="redirect" value="true" />
 						<label for="username">Benutzername:</label>

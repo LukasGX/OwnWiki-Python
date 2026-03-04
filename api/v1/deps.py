@@ -5,7 +5,9 @@ from typing import List, Optional, Dict, Any
 from fastapi.security.api_key import APIKeyHeader
 import secrets
 import hashlib
-
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 DB_PATH = "data/ownwiki.db"
@@ -141,3 +143,22 @@ async def validate_api_key(key: str, request: Request) -> bool:
         )
         row = cursor.fetchone()
         return row is not None
+
+
+# EMAIL
+def send_email(subject: str, body: str, recipients: List[str]):
+    sender = "labegr1@gmail.com"
+    password = "jzee ojbu ruit iend"
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = ', '.join(recipients)
+
+    html_part = MIMEText(body, 'html', 'utf-8')
+    msg.attach(html_part)
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        server.login(sender, password)
+        server.sendmail(sender, recipients, msg.as_string())
+    print("E-Mail gesendet!")

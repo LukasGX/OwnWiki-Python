@@ -20,7 +20,7 @@ def init_db() -> None:
             firstname TEXT NOT NULL,
             lastname TEXT NOT NULL,
             username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
+            email TEXT NOT NULL,
             password_hash TEXT NOT NULL,
             roles TEXT NOT NULL
         );

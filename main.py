@@ -108,8 +108,12 @@ async def login_page(request: Request):
     """
     The OwnWiki login page.
     """
+
+    just_activated = "justActivated" in request.query_params
+
     context = {
-        "request": request
+        "request": request,
+        "just_activated": just_activated
     }
     return templates.TemplateResponse("login.html", context)
 
@@ -545,6 +549,10 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
         "page": page
     }
     return templates.TemplateResponse("discussion.html", context)
+
+@app.get("/activate_account/{uuid}")
+async def activate_account(request: Request, uuid: str):
+    return RedirectResponse(url=f"/api/v1/user/activate/{uuid}", status_code=302)
 
 @app.get("/403", response_class=HTMLResponse)
 async def forbidden_page(request: Request):

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Registrierung bei {SITENAME}</title>
+		<style>
+			/* small inlined subset inspired by standard.css */
+			@font-face {{ font-family: Parkinsans; src: local('Parkinsans'); }}
+			body {{ margin:0;padding:0;font-family:Parkinsans, Arial, Helvetica, sans-serif;background:#f4f6f8;color:#111; }}
+			.email-wrap {{ width:100%;padding:24px 0;background:#f4f6f8; }}
+			.container {{ width:600px;max-width:92%;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(16,24,40,0.06); }}
+			.header-bar {{ display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #eef2ff;background:#fff; }}
+			.logo {{ height:34px;display:block }}
+			.sitename {{ font-size:18px;font-weight:700;color:#2a2cfe;margin:0 }}
+			.hero {{ padding:28px 32px 20px 32px }}
+			.greeting {{ margin:0 0 16px 0;font-size:15px }}
+			.lead {{ margin:0 0 16px 0;font-size:15px;line-height:1.5;color:#111 }}
+			.cta {{ display:inline-block;padding:12px 22px;background:#2a2cfe;color:#fff;text-decoration:none;border-radius:6px;font-weight:700 }}
+			.muted {{ color:#6b7280;font-size:13px }}
+			.link {{ color:#064e71;word-break:break-all }}
+			.footer {{ padding:16px 24px;background:#fafafa;color:#6b7280;font-size:12px;text-align:center }}
+			a {{ color:#2a2cfe }}
+		</style>
+	</head>
+	<body>
+		<table
+			role="presentation"
+			class="email-wrap"
+			cellspacing="0"
+			cellpadding="0">
+			<tr>
+				<td align="center">
+					<table
+						role="presentation"
+						class="container"
+						cellspacing="0"
+						cellpadding="0">
+						<tr>
+							<td class="header-bar">
+								<img
+									src="{LOGO_SRC}"
+									alt="OwnWiki"
+									class="logo" />
+								<h1 class="sitename">{SITENAME}</h1>
+							</td>
+						</tr>
+						<tr>
+							<td class="hero">
+								<p class="greeting">Hallo {USERNAME},</p>
+
+								<p class="lead">
+									herzlich willkommen bei
+									<strong>{SITENAME}</strong>! Bitte bestätige
+									deine E‑Mail‑Adresse, um dein Benutzerkonto
+									zu aktivieren und loszulegen.
+								</p>
+
+								<div style="text-align:center;margin:22px 0;">
+									<a href="{ACTIVATION_LINK}" class="cta"
+										>E‑Mail‑Adresse bestätigen</a
+									>
+								</div>
+
+								<p class="muted">
+									Falls der Button nicht funktioniert, kopiere
+									folgenden Link in deinen Browser:
+								</p>
+								<p class="link">{ACTIVATION_LINK}</p>
+
+								<p class="muted">
+									Wenn du dich nicht registriert hast, kannst
+									du diese E‑Mail ignorieren oder uns unter
+									<a href="mailto:{SUPPORT_EMAIL}"
+										>{SUPPORT_EMAIL}</a
+									>
+									kontaktieren.
+								</p>
+
+								<p
+									style="margin:18px 0 0 0;font-size:14px;color:#111">
+									Viel Erfolg,<br />Dein OwnWiki‑Team
+								</p>
+							</td>
+						</tr>
+						<tr>
+							<td class="footer">
+								© {YEAR} {SITENAME} —
+								<a href="{FOOTER_LINK}"
+									>Impressum &amp; Datenschutz</a
+								>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

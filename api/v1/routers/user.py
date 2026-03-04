@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from api.v1.deps import connect_db
-from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s
+from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s, register_s, activate_account_s
 from api.v1.deps import protect, protect_with_rights
 from typing import Dict, List
 
@@ -19,6 +20,14 @@ async def encrypt(request: Request, input: str, user_roles: Dict[str, List[str]]
 @router.post("/login")
 async def login(request: Request, username: str = Form(...), password: str = Form(...), redirect: str = Form(...), conn = Depends(connect_db)):
     return login_s(request, username, password, redirect, conn)
+
+@router.post("/register")
+async def register(request: Request, firstname: str = Form(...), lastname: str = Form(...), username: str = Form(...), email: str = Form(...), password: str = Form(...), password_repeat: str = Form(...), redirect: str = Form(...), conn = Depends(connect_db)):
+    return register_s(request, firstname, lastname, username, email, password, password_repeat, redirect, conn)
+
+@router.get("/activate/{uuid}")
+async def activate_account(request: Request, uuid: str, conn = Depends(connect_db)):
+    return activate_account_s(uuid, conn)
 
 @router.post("/logout")
 async def logout(request: Request):

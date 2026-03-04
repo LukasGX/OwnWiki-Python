@@ -8,3 +8,5 @@ fonts/Roboto/
 fonts/SourceSans3/
 .env
 dev_secrets/
+data/ownwiki.db
+registrations/*
