@@ -225,3 +225,45 @@ def change_roles_s(username: str, roles_dict: Dict[str, bool]) -> Dict[str, Any]
     
     finally:
         conn.close()
+
+def rename_s(request: Request, username: str, new_username: str, redirect: bool, conn):
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("UPDATE users SET username = ? WHERE username = ?", (new_username, username))
+        
+        if cursor.rowcount == 0:
+            return {"status": "error", "message": f"User '{username}' not found"}
+        
+        conn.commit()
+
+        # rename json
+        old_path_json = f"pages/user/{username}.json"
+        new_path_json = f"pages/user/{new_username}.json"
+        if os.path.exists(old_path_json):
+            os.rename(old_path_json, new_path_json)
+        # change title
+        if os.path.exists(new_path_json):
+            with open(new_path_json, "r") as f:
+                data = json.load(f)
+            data["title"] = f"Benutzer: {new_username}"
+            with open(new_path_json, "w") as f:
+                json.dump(data, f)
+        # rename md
+        old_path_md = f"pages/user/{username}.md"
+        new_path_md = f"pages/user/{new_username}.md"
+        if os.path.exists(old_path_md):
+            os.rename(old_path_md, new_path_md)
+
+        if request.session.get("username") == username:
+            update_session(request, new_username, conn)
+        
+        if redirect: return RedirectResponse(url=f"/wiki/user:{new_username}", status_code=302)
+        return {"status": "success", "new_username": new_username}
+    except sqlite3.IntegrityError:
+        return {"status": "error", "message": f"Username '{new_username}' already exists"}
+    except sqlite3.Error as e:
+        conn.rollback()
+        return {"status": "error", "message": f"DB error: {str(e)}"}
+    finally:
+        conn.close()

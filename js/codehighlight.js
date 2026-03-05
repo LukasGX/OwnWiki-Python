@@ -627,7 +627,6 @@ if (userRolesLink) {
                 </button>
             `);
 
-			// ✅ EventListener nach Modal öffnen
 			document
 				.getElementById("saveRolesBtn")
 				.addEventListener("click", () => {
@@ -639,5 +638,58 @@ if (userRolesLink) {
 				"<h2>Fehler</h2><p>Rollen konnten nicht geladen werden.</p>"
 			);
 		}
+	});
+}
+
+async function changeName(username, newUsername) {
+	try {
+		const response = await fetch(`/api/v1/user/name/${username}`, {
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				new_username: newUsername,
+				redirect: false
+			})
+		});
+
+		if (response.ok) {
+			window.location.href = `/wiki/user:${newUsername}`;
+			return;
+		}
+
+		let data = null;
+		try {
+			data = await response.json();
+		} catch (e) {
+			// ignore JSON parse errors
+		}
+	} catch (error) {
+		console.error("ERROR:", error);
+	}
+}
+
+const renameLink = document.getElementById("rename_link");
+if (renameLink) {
+	const username = PAGE.split(":")[1];
+
+	renameLink.addEventListener("click", () => {
+		openModal(`
+			<h2>Benutzer umbenennen</h2>
+			<input type="text" id="new_username_input" value="${username}" />
+			<button id="renameBtn">Jetzt umbenennen</button>
+		`);
+
+		document.getElementById("renameBtn").addEventListener("click", () => {
+			const newUsername = document
+				.getElementById("new_username_input")
+				.value.trim();
+			if (newUsername.length === 0) {
+				alert("Der neue Benutzername darf nicht leer sein.");
+				return;
+			}
+			changeName(username, newUsername);
+		});
 	});
 }

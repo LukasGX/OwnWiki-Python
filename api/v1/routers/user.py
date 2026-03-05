@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Form, Request, Body
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from api.v1.deps import connect_db
-from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s, register_s, activate_account_s
+from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s, register_s, activate_account_s, rename_s
 from api.v1.deps import protect, protect_with_rights
 from typing import Dict, List
 
@@ -11,6 +11,7 @@ router = APIRouter()
 protect_read = protect_with_rights(["read"])
 protect_debug = protect_with_rights(["debug"])
 protect_userrights = protect_with_rights(["userrights"])
+protect_renameusers = protect_with_rights(["renameusers"])
 
 @router.post("/encrypt")
 async def encrypt(request: Request, input: str, user_roles: Dict[str, List[str]] = Depends(protect_debug)):
@@ -50,3 +51,12 @@ async def change_roles(
     """Required right: userrights"""
     roles_dict = role_data.roles
     return change_roles_s(username, roles_dict)
+
+class RenameData(BaseModel):
+    new_username: str
+    redirect: bool = False
+
+@router.patch("/name/{username}")
+async def change_name(request: Request, username: str, rename_data: RenameData, user_roles: Dict[str, List[str]] = Depends(protect_renameusers), conn = Depends(connect_db)):
+    """Required right: renameusers"""
+    return rename_s(request, username, rename_data.new_username, rename_data.redirect, conn)
