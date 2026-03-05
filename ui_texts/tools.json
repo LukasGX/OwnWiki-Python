@@ -1,0 +1,32 @@
+{
+	"move": {
+		"warning_active": false,
+		"warning": "",
+		"info_active": false,
+		"info": ""
+	},
+	"delete": {
+		"warning_active": false,
+		"warning": "",
+		"info_active": false,
+		"info": ""
+	},
+	"protect": {
+		"warning_active": false,
+		"warning": "",
+		"info_active": false,
+		"info": ""
+	},
+	"userrights": {
+		"warning_active": false,
+		"warning": "",
+		"info_active": false,
+		"info": ""
+	},
+	"rename": {
+		"warning_active": true,
+		"warning": "Das Umbenennen eines Benutzers kann unbeabsichtigte Folgen haben. Bitte stelle sicher, dass du einen triftigen Grund für die Umbenennung des Benutzers hast und dass du die entsprechenden Richtlinien befolgst.",
+		"info_active": false,
+		"info": ""
+	}
+}

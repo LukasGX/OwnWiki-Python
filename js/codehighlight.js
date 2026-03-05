@@ -553,8 +553,12 @@ if (moveLink) {
 	const name = page_split[1];
 
 	moveLink.addEventListener("click", () => {
+		const ui_txts = JSON.parse(UI);
+
 		openModal(`
 			<h2>Seite verschieben</h2>
+			${ui_txts.tools.move.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.move.warning}</p>` : ""}
+			${ui_txts.tools.move.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.move.info}</p>` : ""}
 			Ziel:
 			<input type="text" id="new_ns_input" value="${ns}" />
 			<input type="text" id="new_name_input" value="${name}" />

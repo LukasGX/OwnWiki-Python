@@ -403,6 +403,18 @@ button.small {
 	font-weight: bold;
 }
 
+.warning_small {
+	color: #ffc400;
+	font-size: 0.9rem;
+	display: block;
+}
+
+.info_small {
+	color: rgba(0, 0, 0, 0.7);
+	font-size: 0.9rem;
+	display: block;
+}
+
 .toc {
 	margin-top: 1rem;
 	padding: 0.5rem;

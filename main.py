@@ -203,6 +203,12 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
     if match:
         ns, name = match.groups()
         return RedirectResponse(url=f"/wiki/{ns}:{name}", status_code=302)
+    
+    # get ui texts
+    ui_texts = {}
+
+    with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
+        ui_texts["tools"] = json.load(f)
 
     context = {
         "request": request,
@@ -221,7 +227,9 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
-        "page": page
+        "page": page,
+
+        "ui": ui_texts
     }
     return templates.TemplateResponse("read.html", context)
 
