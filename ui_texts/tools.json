@@ -1,25 +1,25 @@
 {
 	"move": {
-		"warning_active": false,
-		"warning": "",
-		"info_active": false,
-		"info": ""
+		"warning_active": true,
+		"warning": "Das Verschieben einer Seite kann bestehende Links oder Einbindungen ungültig machen. Stelle sicher, dass Titel, Ziel und Weiterleitungen korrekt gesetzt sind.",
+		"info_active": true,
+		"info": "Nach dem Verschieben wird automatisch eine Weiterleitung vom alten Titel erstellt, sofern nicht anders angegeben."
 	},
 	"delete": {
-		"warning_active": false,
-		"warning": "",
+		"warning_active": true,
+		"warning": "Das Löschen einer Seite entfernt deren Inhalt aus der aktiven Ansicht. Gelöschte Seiten können jedoch über die Wiederherstellungsfunktion reaktiviert werden.",
 		"info_active": false,
 		"info": ""
 	},
 	"protect": {
-		"warning_active": false,
-		"warning": "",
+		"warning_active": true,
+		"warning": "Das Schützen einer Seite verhindert Bearbeitungen durch bestimmte Benutzergruppen. Setze den Schutz nur, wenn dies entsprechend den Richtlinien erforderlich ist.",
 		"info_active": false,
 		"info": ""
 	},
 	"userrights": {
-		"warning_active": false,
-		"warning": "",
+		"warning_active": true,
+		"warning": "Das Ändern von Benutzerrechten beeinflusst den Zugriff und die Aktionen eines Kontos. Führe Änderungen nur unter Beachtung der Richtlinien und mit Bedacht durch.",
 		"info_active": false,
 		"info": ""
 	},

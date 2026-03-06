@@ -447,9 +447,13 @@ if (protectLink) {
 		});
 
 	protectLink.addEventListener("click", () => {
+		const ui_txts = JSON.parse(UI);
+
 		openModal(
 			`
 		<h2>Schutzstatus ändern</h2>
+		${ui_txts.tools.protect.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.protect.warning}</p>` : ""}
+			${ui_txts.tools.protect.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.protect.info}</p>` : ""}
 		<button
 			${status == "none" ? `class="highlighted" disabled` : ""}
 			onclick="changeProtection('${ns}', '${name}', 'none')">
@@ -515,8 +519,12 @@ if (deleteLink) {
 
 	deleteLink.addEventListener("click", () => {
 		const word = status ? "wiederherstellen" : "löschen";
+		const ui_txts = JSON.parse(UI);
+
 		openModal(`
 			<h2>Seite ${word}</h2>
+			${ui_txts.tools.delete.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.delete.warning}</p>` : ""}
+			${ui_txts.tools.delete.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.delete.info}</p>` : ""}
 			<button onclick="changeDeletion('${ns}', '${name}', ${status})">Jetzt ${word}</button>
 		`);
 	});
@@ -620,9 +628,12 @@ if (userRolesLink) {
                            ${checked ? "checked" : ""} /> <label for="role_${role.name || role}">${role.name || role}</label><br />
                 `;
 			});
+			const ui_txts = JSON.parse(UI);
 
 			openModal(`
                 <h2>Benutzerrollen verwalten</h2>
+				${ui_txts.tools.userrights.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.userrights.warning}</p>` : ""}
+				${ui_txts.tools.userrights.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.userrights.info}</p>` : ""}
                 ${boxes}<br />
                 <button id="saveRolesBtn" 
                         data-username="${username}"
@@ -679,8 +690,12 @@ if (renameLink) {
 	const username = PAGE.split(":")[1];
 
 	renameLink.addEventListener("click", () => {
+		const ui_txts = JSON.parse(UI);
+
 		openModal(`
 			<h2>Benutzer umbenennen</h2>
+			${ui_txts.tools.rename.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.rename.warning}</p>` : ""}
+			${ui_txts.tools.rename.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.rename.info}</p>` : ""}
 			<input type="text" id="new_username_input" value="${username}" />
 			<button id="renameBtn">Jetzt umbenennen</button>
 		`);
