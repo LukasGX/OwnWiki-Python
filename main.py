@@ -12,7 +12,7 @@ import db
 from colorama import init, Fore
 
 # import routers
-from api.v1.routers import articles, user, roles, rights, debug
+from api.v1.routers import articles, user, roles, rights, debug, search
 
 # import services
 from services.article_service import return_article, return_discussion
@@ -47,6 +47,7 @@ app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
 app.include_router(roles.router, prefix="/api/v1/roles", tags=["roles"])
 app.include_router(rights.router, prefix="/api/v1/rights", tags=["rights"])
 app.include_router(debug.router, prefix="/api/v1/debug", tags=["debug"])
+app.include_router(search.router, prefix="/api/v1/search", tags=["search"])
 
 app.mount("/css", StaticFiles(directory="css"), name="css")
 app.mount("/js", StaticFiles(directory="js"), name="js") 
@@ -421,6 +422,12 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
 
     content = data["content"].lstrip("\t ")
 
+    # get ui texts
+    ui_texts = {}
+
+    with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
+        ui_texts["tools"] = json.load(f)
+
     context = {
         "request": request,
         "title": data["title"],
@@ -434,6 +441,7 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
         "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
         "page": page,
+        "ui": ui_texts
     }
     return templates.TemplateResponse("edit.html", context)
 
@@ -543,6 +551,12 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
     else:
         content = ""
 
+    # get ui texts
+    ui_texts = {}
+
+    with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
+        ui_texts["tools"] = json.load(f)
+
     context = {
         "request": request,
         "content": content,
@@ -554,7 +568,8 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
-        "page": page
+        "page": page,
+        "ui": ui_texts
     }
     return templates.TemplateResponse("discussion.html", context)
 

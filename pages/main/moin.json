@@ -2,7 +2,7 @@
     "title": "Moin",
     "noControls": false,
     "protected": "protected",
-    "deleted": false,
+    "deleted": true,
     "deletionInfo": {
         "user": "admin"
     }

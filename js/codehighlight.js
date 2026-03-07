@@ -712,3 +712,39 @@ if (renameLink) {
 		});
 	});
 }
+
+const searchInput = document.getElementById("search-input");
+if (searchInput) {
+	searchInput.addEventListener("keypress", async (event) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			const query = searchInput.value.trim();
+			if (query) {
+				const q = encodeURIComponent(query);
+
+				const result_pages = await fetch(`/api/v1/search?q=${q}`);
+				const data_pages = await result_pages.json();
+
+				const none = data_pages.results.length === 0;
+
+				openModal(`
+					<h2>Suchergebnisse für "${query}"</h2>
+					${
+						none
+							? "<p>Keine Ergebnisse</p>"
+							: data_pages.results
+									.map(
+										(result) => `
+							<a href="/wiki/${result.name}" class="invis"><div class="search-result">
+								<span class="title">${result.title}</span>
+								<span class="name">${result.name}</span>
+								${result.deleted ? `<div class="deleted-sr">Gelöscht</div>` : ""}
+							</div></a>`
+									)
+									.join("")
+					}
+				`);
+			}
+		}
+	});
+}

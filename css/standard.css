@@ -133,15 +133,21 @@ body {
 }
 
 /* Links */
-a:link,
-a:visited {
+a:not(.invis):link,
+a:not(.invis):visited {
 	color: #2a2cfe;
 	text-decoration: none;
 	position: relative;
 	transition: color 225ms ease;
 }
 
-a:not(.c)::after {
+a.invis:link,
+a.invis:visited {
+	color: inherit;
+	text-decoration: none;
+}
+
+a:not(.c, .invis)::after {
 	content: "";
 	position: absolute;
 	left: 0;
@@ -154,11 +160,11 @@ a:not(.c)::after {
 	transition: 225ms ease;
 }
 
-a:not(.c):hover {
+a:not(.c, .invis):hover {
 	color: rgb(0, 111, 230);
 }
 
-a:not(.c):hover::after {
+a:not(.c, .invis):hover::after {
 	transform: scaleX(1);
 }
 
@@ -991,4 +997,46 @@ p.roles {
 
 #content {
 	resize: vertical !important;
+}
+
+.search-result {
+	background-color: rgba(0, 0, 0, 0.03);
+	border: 1px solid #cccccc;
+	border-radius: 8px;
+	padding: 1rem;
+	margin-bottom: 1rem;
+
+	position: relative;
+
+	transition: 225ms ease;
+}
+
+.search-result:hover {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.search-result .title {
+	font-size: 1rem;
+	font-weight: bold;
+	display: block;
+}
+
+.search-result .name {
+	font-size: 0.8rem;
+	color: #6e6e6e;
+	display: block;
+}
+
+.search-result .deleted-sr {
+	background-color: rgba(255, 0, 0, 0.3);
+	border: 2px solid #690a03;
+	border-radius: 16px;
+	font-size: 0.9rem;
+	width: fit-content;
+	padding: 0.4rem;
+
+	position: absolute;
+	top: 50%;
+	right: 1rem;
+	transform: translateY(-50%);
 }
