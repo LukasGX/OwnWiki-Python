@@ -749,6 +749,8 @@ button.small {
 
 	min-width: 40%;
 	min-height: 10%;
+	max-height: 90%;
+	overflow: auto;
 
 	position: relative;
 
@@ -1052,4 +1054,21 @@ p.roles {
 	top: 50%;
 	right: 1rem;
 	transform: translateY(-50%);
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 1rem;
+}
+
+th,
+td {
+	border: 1px solid #cccccc;
+	padding: 0.5rem;
+	text-align: left;
+}
+
+tr.auto_cb_marking:has(input:checked) td {
+	background: rgba(255, 0, 0, 0.1);
 }

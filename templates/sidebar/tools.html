@@ -13,4 +13,6 @@
 <span><a href="#" id="user_roles_link">Benutzerrechte verwalten</a></span>
 {% endif %} {% if permissions["renameusers"] %}
 <span><a href="#" id="rename_link">Benutzer umbenennen</a></span>
+{% endif %} {% if permissions["block"] %}
+<span><a href="#" id="block_link">Benutzer sperren</a></span>
 {% endif %} {% endif %}

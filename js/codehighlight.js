@@ -788,3 +788,49 @@ if (searchInput) {
 		}
 	});
 }
+
+function handleClickL(checkboxId) {
+	const checkbox = document.getElementById(checkboxId);
+	checkbox.checked = !checkbox.checked;
+}
+
+function blockProcedure(blockLink) {
+	blockLink.addEventListener("click", async () => {
+		const ui_txts = JSON.parse(UI);
+
+		const response = await fetch("/api/v1/rights");
+		const data = await response.json();
+
+		let rows = "";
+		data.forEach((item) => {
+			const right = item && (item.right || item.name || item);
+			const role = item && (item.role || "");
+			rows += `
+				<tr class="auto_cb_marking">
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${right}</td>
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><label for="blockopt_${right}">${role}</label></td>
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="blockopt_${right}" /></td>
+				</tr>`;
+		});
+
+		console.log("Data is an array, processed with new format.");
+
+		openModal(`
+			<h2>Benutzer sperren</h2>
+			${ui_txts.tools.block.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.block.warning}</p>` : ""}
+			${ui_txts.tools.block.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.block.info}</p>` : ""}
+			<table>
+				<tr>
+					<td>Benutzerrecht</td>
+					<td>Rolle</td>
+					<td>Entzug</td>
+				</tr>
+				${rows}
+			</table>
+			<button id="blockBtn">Jetzt sperren</button>
+		`);
+	});
+}
+
+const blockLink = document.getElementById("block_link");
+if (blockLink) blockProcedure(blockLink);
