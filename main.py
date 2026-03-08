@@ -358,16 +358,24 @@ async def all_users(request: Request, conn = Depends(connect_db)):
         "ownwiki-admin": "OwnWiki-Administrator"
     }
 
+    # get ui texts
+    ui_texts = {}
+
+    with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
+        ui_texts["tools"] = json.load(f)
+
     context = {
         "request": request,
         "is_admin": is_admin,
         "role_colors": role_colors,
         "role_names": role_names,
+        "username": session.get("username", "FEHLER"),
 
         "permissions": user_rights,
 
         "logged_in": logged_in,
-        "users": users
+        "users": users,
+        "ui": ui_texts
     }
     return templates.TemplateResponse("users.html", context)
 

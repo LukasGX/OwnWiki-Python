@@ -776,6 +776,7 @@ button.small {
 	border-radius: 8px;
 
 	margin-bottom: 1rem;
+	position: relative;
 }
 
 .infos {
@@ -787,7 +788,19 @@ button.small {
 }
 
 .actions {
-	margin-top: 1rem;
+	display: flex;
+	gap: 0.3rem;
+
+	position: absolute;
+	top: 50%;
+	right: 2rem;
+
+	transform: translateY(-50%);
+}
+
+.actions button {
+	width: stretch;
+	margin-bottom: 0.3rem;
 }
 
 p.username {

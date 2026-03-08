@@ -606,19 +606,33 @@ async function changeRoles(username, rolesObject) {
 	}
 }
 
-const userRolesLink = document.getElementById("user_roles_link");
-if (userRolesLink) {
-	const username = PAGE.split(":")[1];
-	const roles = USERROLES;
+function permissionsProcedure(userRolesLink) {
+	let username = PAGE.split(":")[1];
+
+	if (userRolesLink.getAttribute("data-username")) {
+		username = userRolesLink.getAttribute("data-username");
+	}
+
+	let roles = USERROLES;
+	let conv = true;
+
+	if (userRolesLink.getAttribute("data-userroles")) {
+		roles = userRolesLink
+			.getAttribute("data-userroles")
+			.replaceAll("'", '"');
+		conv = false;
+	}
 
 	userRolesLink.addEventListener("click", async () => {
 		try {
 			const response = await fetch(`/static/roles.json`);
 			const jsonObject = await response.json();
 
-			let cleanRoles = roles.replace(/&#39;/g, '"');
+			let cleanRoles = roles.replaceAll(/&#39;/g, '"');
 			const userData = JSON.parse(cleanRoles);
-			const userRolesArray = userData.roles || [];
+			let userRolesArray = [];
+			if (conv) userRolesArray = userData.roles || [];
+			else userRolesArray = userData || [];
 
 			let boxes = "";
 			jsonObject.forEach((role) => {
@@ -656,7 +670,17 @@ if (userRolesLink) {
 	});
 }
 
-async function changeName(username, newUsername) {
+const userRolesLink = document.getElementById("user_roles_link");
+if (userRolesLink) permissionsProcedure(userRolesLink);
+
+const userRolesLinksAttr = document.querySelectorAll(
+	"[data-func='permissions-link']"
+);
+userRolesLinksAttr.forEach((link) => {
+	permissionsProcedure(link);
+});
+
+async function changeName(username, newUsername, proceedToUsers) {
 	try {
 		const response = await fetch(`/api/v1/user/name/${username}`, {
 			method: "PATCH",
@@ -669,8 +693,13 @@ async function changeName(username, newUsername) {
 			})
 		});
 
-		if (response.ok) {
+		if (response.ok && !proceedToUsers) {
 			window.location.href = `/wiki/user:${newUsername}`;
+			return;
+		}
+
+		if (response.ok && proceedToUsers) {
+			window.location.href = `/users`;
 			return;
 		}
 
@@ -685,9 +714,12 @@ async function changeName(username, newUsername) {
 	}
 }
 
-const renameLink = document.getElementById("rename_link");
-if (renameLink) {
-	const username = PAGE.split(":")[1];
+function renameProcedure(renameLink, proceedToUsers = false) {
+	let username = PAGE.split(":")[1];
+
+	if (renameLink.getAttribute("data-username")) {
+		username = renameLink.getAttribute("data-username");
+	}
 
 	renameLink.addEventListener("click", () => {
 		const ui_txts = JSON.parse(UI);
@@ -708,10 +740,18 @@ if (renameLink) {
 				alert("Der neue Benutzername darf nicht leer sein.");
 				return;
 			}
-			changeName(username, newUsername);
+			changeName(username, newUsername, proceedToUsers);
 		});
 	});
 }
+
+const renameLink = document.getElementById("rename_link");
+if (renameLink) renameProcedure(renameLink, false);
+
+const renameLinksAttr = document.querySelectorAll("[data-func='rename-link']");
+renameLinksAttr.forEach((link) => {
+	renameProcedure(link, true);
+});
 
 const searchInput = document.getElementById("search-input");
 if (searchInput) {

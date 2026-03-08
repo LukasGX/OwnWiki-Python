@@ -65,13 +65,22 @@
 						</div>
 						<div class="actions">
 							{% if permissions["renameusers"] == True %}
-							<button class="small">Umbenennen</button>
+							<button
+								data-func="rename-link"
+								data-username="{{ user.username }}">
+								<i class="fas fa-user-pen"></i>
+							</button>
 							{% endif %} {% if permissions["userrights"] == True
 							%}
-							<button class="small">Rollen ändern</button>
+							<button
+								data-func="permissions-link"
+								data-username="{{ user.username }}"
+								data-userroles="{{ user.roles }}">
+								<i class="fas fa-key"></i>
+							</button>
 							{% endif %} {% if permissions["block"] == True %}
-							<button class="deleteButton small">
-								Blockieren
+							<button class="deleteButton">
+								<i class="fas fa-user-lock"></i>
 							</button>
 							{% endif %}
 						</div>
@@ -106,6 +115,7 @@
 			const PAGE = '{{ page }}';
 			const USER = '{{ username }}';
 			const USERROLES = '{{ user_roles }}';
+			const UI = '{{ ui | tojson }}';
 		</script>
 		<script src="/js/sel2.js"></script>
 		<script src="/js/codehighlight.js"></script>
