@@ -791,6 +791,7 @@ if (searchInput) {
 
 function handleClickL(checkboxId) {
 	const checkbox = document.getElementById(checkboxId);
+	if (checkbox.disabled) return;
 	checkbox.checked = !checkbox.checked;
 }
 
@@ -798,22 +799,23 @@ function blockProcedure(blockLink) {
 	blockLink.addEventListener("click", async () => {
 		const ui_txts = JSON.parse(UI);
 
-		const response = await fetch("/api/v1/rights");
+		const response = await fetch("/static/blocking.json");
 		const data = await response.json();
 
 		let rows = "";
 		data.forEach((item) => {
-			const right = item && (item.right || item.name || item);
+			const right = item && (item.right || "");
 			const role = item && (item.role || "");
+			const withdrawnByDefault = item && item.withdrawnByDefault === true;
+			const lockDefault = item && item.lockDefault === true;
+
 			rows += `
 				<tr class="auto_cb_marking">
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${right}</td>
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><label for="blockopt_${right}">${role}</label></td>
-					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="blockopt_${right}" /></td>
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="blockopt_${right}" ${withdrawnByDefault ? "checked" : ""} ${lockDefault ? "disabled" : ""} /></td>
 				</tr>`;
 		});
-
-		console.log("Data is an array, processed with new format.");
 
 		openModal(`
 			<h2>Benutzer sperren</h2>
@@ -827,8 +829,25 @@ function blockProcedure(blockLink) {
 				</tr>
 				${rows}
 			</table>
-			<button id="blockBtn">Jetzt sperren</button>
+			<p><input type="checkbox" id="permanent" name="permanent" /> <label for="permanent">Dauerhafte Sperrung</label></p>
+			<label for="duration">Dauer der Sperrung:</label>
+			<input type="text" id="duration" name="duration" placeholder="z.B. 1j 3m 2w 5h 8min" />
+			<label for="reason">Grund für die Sperrung:</label><br />
+			<textarea id="reason" name="reason"></textarea>
+			<button id="blockBtn">Jetzt sperren</button> <button class="cancelButton" id="close-modal">Abbrechen</button>
 		`);
+
+		document.getElementById("permanent").addEventListener("change", () => {
+			if (document.getElementById("permanent").checked) {
+				document.getElementById("duration").style.display = "none";
+			} else {
+				document.getElementById("duration").style.display = "block";
+			}
+		});
+
+		document.getElementById("close-modal").addEventListener("click", () => {
+			document.querySelector(".modal").remove();
+		});
 	});
 }
 

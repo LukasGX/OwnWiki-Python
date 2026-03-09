@@ -1,0 +1,314 @@
+[
+	{
+		"right": "read",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "default"
+	},
+	{
+		"right": "createaccount",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "default"
+	},
+	{
+		"right": "edit",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "user"
+	},
+	{
+		"right": "applytags",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "user"
+	},
+	{
+		"right": "sendemail",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "user"
+	},
+	{
+		"right": "editmyoptions",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "user"
+	},
+	{
+		"right": "editmyprivateinfo",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "user"
+	},
+	{
+		"right": "editmywatchlist",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "user"
+	},
+	{
+		"right": "viewmyprivateinfo",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "user"
+	},
+	{
+		"right": "viewmywatchlist",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "user"
+	},
+	{
+		"right": "createpage",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "creatediscussion",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "editsemiprotected",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "minoredit",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "upload",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "uploadbyurl",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "editcontentmodel",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "pagelang",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "export",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "autoconfirmed",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "autoconfirmed"
+	},
+	{
+		"right": "import",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "bot"
+	},
+	{
+		"right": "higherapilimits",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "bot"
+	},
+	{
+		"right": "bot",
+		"withdrawnByDefault": false,
+		"lockDefault": true,
+		"role": "bot"
+	},
+	{
+		"right": "suppressredirect",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "bot"
+	},
+	{
+		"right": "editprotected",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "move",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "movefile",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "reupload",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "admin"
+	},
+	{
+		"right": "delete",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "bigdelete",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "block",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "blockemail",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "browsedeleted",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "admin"
+	},
+	{
+		"right": "protect",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "rollback",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "admin"
+	},
+	{
+		"right": "undelete",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "deletetags",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "managetags",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "ipblockbypass",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "admin"
+	},
+	{
+		"right": "editinterface",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "interface-admin"
+	},
+	{
+		"right": "editsitecss",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "interface-admin"
+	},
+	{
+		"right": "editsitejs",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "interface-admin"
+	},
+	{
+		"right": "editsuperprotected",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "interface-admin"
+	},
+	{
+		"right": "userrights",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "bureaucrat"
+	},
+	{
+		"right": "renameusers",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "bureaucrat"
+	},
+	{
+		"right": "deletelogentry",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "oversighter"
+	},
+	{
+		"right": "deletehistory",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "oversighter"
+	},
+	{
+		"right": "hideuser",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "oversighter"
+	},
+	{
+		"right": "suppressionlog",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "oversighter"
+	},
+	{
+		"right": "supresshistory",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "oversighter"
+	},
+	{
+		"right": "viewsuppressed",
+		"withdrawnByDefault": true,
+		"lockDefault": false,
+		"role": "oversighter"
+	},
+	{
+		"right": "debug",
+		"withdrawnByDefault": true,
+		"lockDefault": true,
+		"role": "ownwiki-admin"
+	}
+]
