@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, Request, Body
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from api.v1.deps import connect_db
-from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s, register_s, activate_account_s, rename_s
+from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s, register_s, activate_account_s, rename_s, block_user_s
 from api.v1.deps import protect, protect_with_rights
 from typing import Dict, List
 
@@ -11,6 +11,7 @@ router = APIRouter()
 protect_read = protect_with_rights(["read"])
 protect_debug = protect_with_rights(["debug"])
 protect_userrights = protect_with_rights(["userrights"])
+protect_block = protect_with_rights(["block"])
 protect_renameusers = protect_with_rights(["renameusers"])
 
 @router.post("/encrypt")
@@ -60,3 +61,8 @@ class RenameData(BaseModel):
 async def change_name(request: Request, username: str, rename_data: RenameData, user_roles: Dict[str, List[str]] = Depends(protect_renameusers), conn = Depends(connect_db)):
     """Required right: renameusers"""
     return rename_s(request, username, rename_data.new_username, rename_data.redirect, conn)
+
+@router.post("/block/{username}")
+async def block_user(request: Request, username: str, block_until: str = Body(...), withdrawn_rights: List[str] = Body(...), permanent: bool = Body(False), reason: str = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_block), conn = Depends(connect_db)):
+    """Required right: userrights"""
+    return block_user_s(request, username, block_until, withdrawn_rights, permanent, reason, conn)

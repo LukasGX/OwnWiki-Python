@@ -267,3 +267,45 @@ def rename_s(request: Request, username: str, new_username: str, redirect: bool,
         return {"status": "error", "message": f"DB error: {str(e)}"}
     finally:
         conn.close()
+
+def block_user_s(request: Request, username: str, block_until: str, withdrawn_rights: list, is_permanent: bool, reason: str, conn):
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        
+        if user is None:
+            return {"status": "error", "message": f"User '{username}' not found"}
+        
+        user_id = user[0]
+
+        cursor.execute("SELECT id FROM users WHERE username = ?", (request.session.get("username"),))
+        admin_user = cursor.fetchone()
+        if admin_user is None:
+            return {"status": "error", "message": "Admin user not found"}
+        
+        admin_id = admin_user[0]
+
+        cursor.execute("SELECT id FROM blocks WHERE user_id = ?", (user_id,))
+        existing_block = cursor.fetchone()
+
+        if existing_block:
+            cursor.execute("""
+                UPDATE blocks 
+                SET block_until = ?, withdrawnRights = ?, is_permanent = ?, admin_id = ?, reason = ?
+                WHERE user_id = ?
+            """, (block_until, ';'.join(withdrawn_rights), is_permanent, admin_id, reason, user_id))
+        else:
+            cursor.execute("""
+                INSERT INTO blocks (user_id, block_until, withdrawnRights, is_permanent, admin_id, reason) 
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (user_id, block_until, ';'.join(withdrawn_rights), is_permanent, admin_id, reason))
+        
+        conn.commit()
+        return {"status": "success", "message": f"User '{username}' has been blocked until {block_until}"}
+    except sqlite3.Error as e:
+        conn.rollback()
+        return {"status": "error", "message": f"DB error: {str(e)}"}
+    finally:
+        conn.close()

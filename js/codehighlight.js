@@ -795,6 +795,57 @@ function handleClickL(checkboxId) {
 	checkbox.checked = !checkbox.checked;
 }
 
+async function blockUser() {
+	let username = PAGE.split(":")[1];
+
+	// get withdrawn rights
+	const response_json = await fetch("/static/blocking.json");
+	const data_json = await response_json.json();
+
+	// from json (to prevent abuse)
+	const jsonRights = data_json
+		.filter(
+			(item) =>
+				item.withdrawnByDefault === true && item.lockDefault === true
+		)
+		.map((item) => item.right);
+
+	// optional ones (checkboxes)
+	const checkboxRights = Array.from(
+		document.querySelectorAll('input[id^="blockopt_"]:checked')
+	).map((cb) => cb.id.replace("blockopt_", ""));
+
+	// collect params
+	const withdrawnRights = [...new Set([...jsonRights, ...checkboxRights])];
+	const permanent = document.getElementById("permanent").checked;
+	const duration = document.getElementById("duration").value;
+	const reason = document.getElementById("reason").value;
+
+	const response = await fetch(`/api/v1/user/block/${username}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			withdrawn_rights: withdrawnRights,
+			permanent: permanent,
+			block_until: duration,
+			reason: reason
+		})
+	});
+
+	const data = await response.json();
+
+	if (response.ok) {
+		window.location.href = `/wiki/user:${username}`;
+	} else {
+		console.error("Error while blocking user:", data);
+		openModal(
+			"<h2>Fehler</h2><p>Der Benutzer konnte nicht gesperrt werden.</p>"
+		);
+	}
+}
+
 function blockProcedure(blockLink) {
 	blockLink.addEventListener("click", async () => {
 		const ui_txts = JSON.parse(UI);
@@ -813,7 +864,7 @@ function blockProcedure(blockLink) {
 				<tr class="auto_cb_marking">
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${right}</td>
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><label for="blockopt_${right}">${role}</label></td>
-					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="blockopt_${right}" ${withdrawnByDefault ? "checked" : ""} ${lockDefault ? "disabled" : ""} /></td>
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="${lockDefault ? "" : `blockopt_${right}`}" ${withdrawnByDefault ? "checked" : ""} ${lockDefault ? "disabled" : ""} /></td>
 				</tr>`;
 		});
 
@@ -848,6 +899,10 @@ function blockProcedure(blockLink) {
 		document.getElementById("close-modal").addEventListener("click", () => {
 			document.querySelector(".modal").remove();
 		});
+
+		document
+			.getElementById("blockBtn")
+			.addEventListener("click", blockUser);
 	});
 }
 
