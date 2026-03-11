@@ -373,3 +373,40 @@ def block_user_s(request: Request, username: str, block_until: str, withdrawn_ri
         return {"status": "error", "message": f"DB error: {str(e)}"}
     finally:
         conn.close()
+
+def send_email_s(request: Request, username: str, message: str, conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT email FROM users WHERE username = ?", (username,))
+    user = cursor.fetchone()
+
+    if user is None:
+        return {"status": "error", "message": f"User '{username}' not found"}
+
+    recipient_email = user[0]
+
+    sender_username = request.session.get("username", "Unbekannt")
+
+    with open("resources/ownwiki-logo-mini.png", "rb") as image_file:
+        encoded = base64.b64encode(image_file.read()).decode('utf-8')
+
+    logo_src = f"data:image/png;base64,{encoded}"
+
+    with open("email_templates/usermsg.html", "r") as f:
+        email_body = f.read().format(
+            SITENAME="OwnWiki",
+            USERNAME=username,
+            SUPPORT_EMAIL="support@ownwiki.org",
+            YEAR=2026,
+            FOOTER_LINK="ownwiki.org",
+            SENDING_USER=sender_username,
+            MESSAGE=message,
+            LOGO_SRC=logo_src
+        )
+
+    send_email(
+        subject="OwnWiki - Neue Nachricht von " + sender_username,
+        body=email_body,
+        recipients=[recipient_email]
+    )
+
+    return {"status": "success", "message": f"Message sent to '{username}'"}

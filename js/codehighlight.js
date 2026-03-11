@@ -908,3 +908,25 @@ function blockProcedure(blockLink) {
 
 const blockLink = document.getElementById("block_link");
 if (blockLink) blockProcedure(blockLink);
+
+const sendEmailBtn = document.getElementById("send-email-btn");
+if (sendEmailBtn) {
+	sendEmailBtn.addEventListener("click", async () => {
+		const to_user = document.getElementById("username").value;
+		const message = document.getElementById("msg").value;
+
+		const response = await fetch(`/api/v1/user/email/${to_user}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/text"
+			},
+			body: message
+		});
+
+		if (response.ok) {
+			alert("E-Mail erfolgreich gesendet.");
+		} else {
+			console.error("Error while sending email");
+		}
+	});
+}

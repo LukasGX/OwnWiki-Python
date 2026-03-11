@@ -681,3 +681,37 @@ async def page_not_found(request: Request):
         "username": session.get("username", "Anonymous")
     }
     return templates.TemplateResponse("404.html", context)
+
+@app.get("/email")
+async def test_email(request: Request):
+    """
+    Send an email to other users
+    """
+
+    session = get_session_data(request)
+    if "username" in session:
+        logged_in = True
+    else:
+        logged_in = False
+
+    user_rights = get_user_rights(request)
+    needed_right = "sendemail"
+
+    if needed_right not in user_rights or not user_rights[needed_right]:
+        p = f"/email"
+
+        request.session["redirect_data"] = {
+            "page": p,
+            "right": needed_right
+        }
+        return RedirectResponse(url="/403", status_code=302)
+
+    context = {
+        "request": request,
+        "needed_right": needed_right,
+        "permissions": user_rights,
+
+        "logged_in": logged_in,
+        "username": session.get("username", "Anonymous")
+    }
+    return templates.TemplateResponse("email.html", context)

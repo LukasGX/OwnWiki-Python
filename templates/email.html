@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>OwnWiki</title>
+
+		<link rel="stylesheet" href="/fonts/fonts.css" />
+		<link rel="stylesheet" href="/font-awesome/css/all.css" />
+		<link rel="stylesheet" href="/css/standard.css" />
+		<link
+			rel="shortcut icon"
+			href="/static/favicon.ico"
+			type="image/x-icon" />
+	</head>
+	<body>
+		<div class="header">
+			<img
+				src="/resources/ownwiki-logo-mini.png"
+				class="side-logo"
+				alt="OwnWiki Logo" />
+			<input
+				type="text"
+				id="search-input"
+				name="search"
+				placeholder="OwnWiki durchsuchen"
+				class="search-bar" />
+			<div class="user-menu">
+				<i class="fas fa-bell icon"></i>
+			</div>
+		</div>
+
+		<div class="msplit">
+			<div class="side">
+				<img
+					src="/resources/ownwiki-logo.png"
+					class="side-logo"
+					alt="OwnWiki Logo" />
+				<div class="side-links">
+					{% include '/sidebar/user.html' with context %}
+				</div>
+				<div class="side-links">
+					{% include '/sidebar/fastnav.html' with context %}
+				</div>
+			</div>
+
+			<div class="content-wrapper">
+				<div class="content">
+					<h1 class="page_title">E-Mail senden</h1>
+					<label for="username">Benutzer:</label>
+					<input type="text" name="username" id="username" />
+					<label for="msg">Nachricht:</label>
+					<textarea name="msg" id="msg"></textarea>
+					<button id="send-email-btn">Senden</button>
+				</div>
+
+				<div id="poweredby">
+					<img
+						src="/resources/ownwiki-logo-mini.png"
+						alt="OwnWiki Logo" />
+					<p>Powered by<br />OwnWiki</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- jquery -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<!-- select2 -->
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css"
+			rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+		<!-- flatpickr -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+		<!-- own scripts -->
+		<script>
+			const USER = '{{ username }}';
+			const USERROLES = '{{ user_roles }}';
+		</script>
+		<script src="/js/sel2.js"></script>
+		<script src="/js/codehighlight.js"></script>
+		<script src="/js/manipulate_datetime.js"></script>
+		<script src="/js/bridges.js"></script>
+
+		<script>
+			const ta = document.getElementById('content');
+			ta.addEventListener('input', () => {
+			    ta.style.height = 'auto';
+			    ta.style.height = ta.scrollHeight + 'px';
+			});
+			ta.style.height = ta.scrollHeight + 'px';
+		</script>
+	</body>
+</html>
