@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import db
+import sqlite3
 
 from colorama import init, Fore
 
@@ -65,6 +66,54 @@ def get_user_rights(request: Request):
         rights = get_rights_by_role(role)
         for right, value in rights.items():
             user_rights[right] = value
+
+    # Respect active blocks: withdraw rights listed in blocks.withdrawnRights
+    username = request.session.get("username", "")
+    if username:
+        try:
+            conn = sqlite3.connect(db.DB_PATH, check_same_thread=False)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+            urow = cursor.fetchone()
+            if urow:
+                user_id = urow["id"] if isinstance(urow, (dict, sqlite3.Row)) else urow[0]
+                cursor.execute(
+                    "SELECT withdrawnRights, is_permanent, block_until FROM blocks WHERE user_id = ?",
+                    (user_id,)
+                )
+                brow = cursor.fetchone()
+                if brow:
+                    is_perm = bool(brow["is_permanent"]) if "is_permanent" in brow.keys() else bool(brow[2])
+                    block_until = brow["block_until"] if "block_until" in brow.keys() else brow[2]
+
+                    active = False
+                    if is_perm:
+                        active = True
+                    else:
+                        if block_until is None:
+                            active = True
+                        else:
+                            try:
+                                bu_dt = datetime.fromisoformat(str(block_until))
+                                if bu_dt > datetime.now():
+                                    active = True
+                            except Exception:
+                                # if parsing fails, treat block as active to be safe
+                                active = True
+
+                    if active:
+                        withdrawn = brow["withdrawnRights"] if "withdrawnRights" in brow.keys() else brow[0]
+                        if withdrawn:
+                            for r in [x.strip() for x in str(withdrawn).split(";") if x.strip()]:
+                                user_rights[r] = False
+        except Exception:
+            pass
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
     # fill missing rights with False
     with open("static/rightlist.json", "r", encoding="utf-8") as f:
