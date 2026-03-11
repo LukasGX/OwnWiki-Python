@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import re
 import sqlite3
 from typing import Any, Dict
 import uuid
@@ -9,6 +10,8 @@ from fastapi.responses import RedirectResponse
 from api.v1.deps import connect_db, send_email
 from sessions import set_session_data, clear_session
 from argon2 import PasswordHasher
+from datetime import datetime, timedelta
+
 
 ph = PasswordHasher()
 
@@ -268,17 +271,43 @@ def rename_s(request: Request, username: str, new_username: str, redirect: bool,
     finally:
         conn.close()
 
+def parse_duration(input_str):
+    if input_str.lower() == 'dauerhaft':
+        return None
+    
+    input_str = input_str.replace(" ", "")
+    
+    total_seconds = 0
+    units = {
+        'j': 365 * 24 * 3600,
+        'm': 30 * 24 * 3600,
+        'w': 7 * 24 * 3600,
+        't': 24 * 3600,
+        'h': 3600,
+        'min': 60
+    }
+    
+    for match in re.finditer(r'(\d+)(min|[jwmth])', input_str.lower()):
+        num = int(match.group(1))
+        unit = match.group(2)
+        total_seconds += num * units.get(unit, 0)
+        print(f"Matched: {num}{unit}")
+    
+    return timedelta(seconds=total_seconds)
+
 def block_user_s(request: Request, username: str, block_until: str, withdrawn_rights: list, is_permanent: bool, reason: str, conn):
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+        cursor.execute("SELECT id, firstname, email FROM users WHERE username = ?", (username,))
         user = cursor.fetchone()
         
         if user is None:
             return {"status": "error", "message": f"User '{username}' not found"}
         
         user_id = user[0]
+        user_firstname = user[1]
+        user_email = user[2]
 
         cursor.execute("SELECT id FROM users WHERE username = ?", (request.session.get("username"),))
         admin_user = cursor.fetchone()
@@ -290,19 +319,54 @@ def block_user_s(request: Request, username: str, block_until: str, withdrawn_ri
         cursor.execute("SELECT id FROM blocks WHERE user_id = ?", (user_id,))
         existing_block = cursor.fetchone()
 
+        # parse block_until to correct format
+        time_delta = parse_duration(block_until)
+        expiry = datetime.now() + time_delta
+
         if existing_block:
             cursor.execute("""
                 UPDATE blocks 
                 SET block_until = ?, withdrawnRights = ?, is_permanent = ?, admin_id = ?, reason = ?
                 WHERE user_id = ?
-            """, (block_until, ';'.join(withdrawn_rights), is_permanent, admin_id, reason, user_id))
+            """, (expiry, ';'.join(withdrawn_rights), is_permanent, admin_id, reason, user_id))
         else:
             cursor.execute("""
                 INSERT INTO blocks (user_id, block_until, withdrawnRights, is_permanent, admin_id, reason) 
                 VALUES (?, ?, ?, ?, ?, ?)
-            """, (user_id, block_until, ';'.join(withdrawn_rights), is_permanent, admin_id, reason))
+            """, (user_id, expiry, ';'.join(withdrawn_rights), is_permanent, admin_id, reason))
         
         conn.commit()
+
+        # send mail to user
+        with open("resources/ownwiki-logo-mini.png", "rb") as image_file:
+            encoded = base64.b64encode(image_file.read()).decode('utf-8')
+
+        logo_src = f"data:image/png;base64,{encoded}"
+        block_type = "dauerhaft" if is_permanent else f"vorübergehend"
+        end_string = "" if is_permanent else f"<span class='fat'>Ablauf der Sperre:</span> {expiry.strftime("%d.%m.%Y %H:%M:%S")}<br />"
+        expiry_note = "" if is_permanent else f"Die Sperre läuft automatisch ab. Danach steht Ihnen Ihr Konto wieder voll zur Verfügung."
+
+        with open("email_templates/block.html", "r") as f:
+            email_body = f.read().format(
+                SITENAME="OwnWiki",
+                FIRSTNAME=user_firstname,
+                USERNAME=username,
+                SUPPORT_EMAIL="support@ownwiki.org",
+                YEAR=2026,
+                FOOTER_LINK="ownwiki.org",
+                REASON=reason,
+                BLOCK_TYPE=block_type,
+                END_STRING=end_string,
+                EXPIRY_NOTE=expiry_note,
+                LOGO_SRC=logo_src
+            )
+
+        send_email(
+            subject="OwnWiki-Konto gesperrt",
+            body=email_body,
+            recipients=[user_email]
+        )
+
         return {"status": "success", "message": f"User '{username}' has been blocked until {block_until}"}
     except sqlite3.Error as e:
         conn.rollback()
