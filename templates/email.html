@@ -14,21 +14,7 @@
 			type="image/x-icon" />
 	</head>
 	<body>
-		<div class="header">
-			<img
-				src="/resources/ownwiki-logo-mini.png"
-				class="side-logo"
-				alt="OwnWiki Logo" />
-			<input
-				type="text"
-				id="search-input"
-				name="search"
-				placeholder="OwnWiki durchsuchen"
-				class="search-bar" />
-			<div class="user-menu">
-				<i class="fas fa-bell icon"></i>
-			</div>
-		</div>
+		{% include '/include/header.html' with context %}
 
 		<div class="msplit">
 			<div class="side">

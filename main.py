@@ -161,9 +161,31 @@ async def login_page(request: Request):
 
     just_activated = "justActivated" in request.query_params
 
+    session = get_session_data(request)
+
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            conn_local = sqlite3.connect(db.DB_PATH, check_same_thread=False)
+            block_info = get_block_info_s(request, username, conn_local)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+        finally:
+            try:
+                conn_local.close()
+            except Exception:
+                pass
+
     context = {
         "request": request,
-        "just_activated": just_activated
+        "just_activated": just_activated,
+        "block_info": block_info,
+        "block_duration": block_duration,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("login.html", context)
 
@@ -172,8 +194,30 @@ async def login_page(request: Request):
     """
     The OwnWiki account creation page.
     """
+    session = get_session_data(request)
+
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            conn_local = sqlite3.connect(db.DB_PATH, check_same_thread=False)
+            block_info = get_block_info_s(request, username, conn_local)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+        finally:
+            try:
+                conn_local.close()
+            except Exception:
+                pass
+
     context = {
-        "request": request
+        "request": request,
+        "block_info": block_info,
+        "block_duration": block_duration,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("register.html", context)
 
@@ -260,6 +304,18 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
     with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
         ui_texts["tools"] = json.load(f)
 
+    # block info
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            block_info = get_block_info_s(request, username, conn)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+
     context = {
         "request": request,
         "title": data["title"],
@@ -276,8 +332,11 @@ async def wiki_page(request: Request, page: str = Path(..., min_length=1), conn 
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
+        "block_info": block_info,
+        "block_duration": block_duration,
         "is_admin": is_admin,
         "page": page,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", []))),
 
         "ui": ui_texts
     }
@@ -340,6 +399,11 @@ async def account_page(request: Request, conn = Depends(connect_db)):
         "block_info": block_info,
         "block_duration": datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
     }
+    # add user_roles for templates (from session)
+    try:
+        context["user_roles"] = (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
+    except Exception:
+        context["user_roles"] = []
     return templates.TemplateResponse("account.html", context)
 
 @app.get("/users", response_class=HTMLResponse)
@@ -418,6 +482,24 @@ async def all_users(request: Request, conn = Depends(connect_db)):
     with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
         ui_texts["tools"] = json.load(f)
 
+    # block info (use a fresh connection)
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            conn_local = sqlite3.connect(db.DB_PATH, check_same_thread=False)
+            block_info = get_block_info_s(request, username, conn_local)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+        finally:
+            try:
+                conn_local.close()
+            except Exception:
+                pass
+
     context = {
         "request": request,
         "is_admin": is_admin,
@@ -429,7 +511,10 @@ async def all_users(request: Request, conn = Depends(connect_db)):
 
         "logged_in": logged_in,
         "users": users,
-        "ui": ui_texts
+        "ui": ui_texts,
+        "block_info": block_info,
+        "block_duration": block_duration,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("users.html", context)
 
@@ -490,6 +575,18 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
     with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
         ui_texts["tools"] = json.load(f)
 
+    # block info
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            block_info = get_block_info_s(request, username, conn)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+
     context = {
         "request": request,
         "title": data["title"],
@@ -503,7 +600,8 @@ async def edit_page(request: Request, page: str = Path(..., min_length=1), conn 
         "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
         "page": page,
-        "ui": ui_texts
+        "ui": ui_texts,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("edit.html", context)
 
@@ -548,6 +646,17 @@ async def create_page(request: Request, page: str = Path(..., min_length=1), con
         is_admin = True
     else:
         is_admin = False
+    # block info
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            block_info = get_block_info_s(request, username, conn)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
 
     context = {
         "request": request,
@@ -559,8 +668,15 @@ async def create_page(request: Request, page: str = Path(..., min_length=1), con
         "permissions": user_rights,
 
         "logged_in": logged_in,
-        "username": session.get("username", "Anonymous")
+        "username": session.get("username", "Anonymous"),
+        "block_info": block_info,
+        "block_duration": block_duration
     }
+    # add user_roles
+    try:
+        context["user_roles"] = (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
+    except Exception:
+        context["user_roles"] = []
     return templates.TemplateResponse("create.html", context)
 
 @app.get("/wiki/{page}/discussion", response_class=HTMLResponse)
@@ -618,6 +734,17 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
 
     with open("ui_texts/tools.json", "r", encoding="utf-8") as f:
         ui_texts["tools"] = json.load(f)
+    # block info
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            block_info = get_block_info_s(request, username, conn)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
 
     context = {
         "request": request,
@@ -631,7 +758,10 @@ async def discussion_page(request: Request, page: str = Path(..., min_length=1),
         "username": session.get("username", "Anonymous"),
         "is_admin": is_admin,
         "page": page,
-        "ui": ui_texts
+        "ui": ui_texts,
+        "block_info": block_info,
+        "block_duration": block_duration,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("discussion.html", context)
 
@@ -653,6 +783,23 @@ async def forbidden_page(request: Request):
         logged_in = True
     else:
         logged_in = False
+    # block info
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            conn_local = sqlite3.connect(db.DB_PATH, check_same_thread=False)
+            block_info = get_block_info_s(request, username, conn_local)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+        finally:
+            try:
+                conn_local.close()
+            except Exception:
+                pass
 
     context = {
         "request": request,
@@ -660,7 +807,10 @@ async def forbidden_page(request: Request):
         "right": right,
 
         "logged_in": logged_in,
-        "username": session.get("username", "Anonymous")
+        "username": session.get("username", "Anonymous"),
+        "block_info": block_info,
+        "block_duration": block_duration,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("403.html", context)
 
@@ -677,13 +827,33 @@ async def page_not_found(request: Request):
 
     redirect_data = session.get("redirect_data", {})
     page = redirect_data.get("page")
+    # block info
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            conn_local = sqlite3.connect(db.DB_PATH, check_same_thread=False)
+            block_info = get_block_info_s(request, username, conn_local)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+        finally:
+            try:
+                conn_local.close()
+            except Exception:
+                pass
 
     context = {
         "request": request,
         "page": page,
 
         "logged_in": logged_in,
-        "username": session.get("username", "Anonymous")
+        "username": session.get("username", "Anonymous"),
+        "block_info": block_info,
+        "block_duration": block_duration,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("404.html", context)
 
@@ -710,6 +880,23 @@ async def test_email(request: Request):
             "right": needed_right
         }
         return RedirectResponse(url="/403", status_code=302)
+    # block info
+    block_info = {}
+    block_duration = None
+    username = session.get("username", "")
+    if username:
+        try:
+            conn_local = sqlite3.connect(db.DB_PATH, check_same_thread=False)
+            block_info = get_block_info_s(request, username, conn_local)
+            block_duration = datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
+        except Exception:
+            block_info = {}
+            block_duration = None
+        finally:
+            try:
+                conn_local.close()
+            except Exception:
+                pass
 
     context = {
         "request": request,
@@ -717,6 +904,9 @@ async def test_email(request: Request):
         "permissions": user_rights,
 
         "logged_in": logged_in,
-        "username": session.get("username", "Anonymous")
+        "username": session.get("username", "Anonymous"),
+        "block_info": block_info,
+        "block_duration": block_duration,
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("email.html", context)
