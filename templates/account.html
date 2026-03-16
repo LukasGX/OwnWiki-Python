@@ -74,6 +74,25 @@
 						</p>
 					</div>
 
+					{% if block_info.blocked %}
+					<div class="blocked">
+						<span>
+							Du bist {% if block_info.is_permanent %}dauerhaft{%
+							else %}vorübergehend{% endif %} gesperrt
+						</span>
+						{% if not block_info.is_permanent %}
+						<span>
+							<span class="fat">Ablauf der Sperre: </span>
+							{{ block_duration }}
+						</span>
+						{% endif %}
+						<span>
+							<span class="fat">Grund: </span>
+							{{ block_info.reason }}
+						</span>
+					</div>
+					{% endif %}
+
 					<h2>Einstellungen</h2>
 					<p class="info-settings">
 						<i class="fas fa-circle-info"></i>

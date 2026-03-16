@@ -18,7 +18,7 @@ from api.v1.routers import articles, user, roles, rights, debug, search
 # import services
 from services.article_service import return_article, return_discussion
 from services.roles_service import get_role_color, get_role_name
-from services.user_service import update_session, get_roles_s
+from services.user_service import update_session, get_roles_s, get_block_info_s
 from services.rights_service import get_rights_by_role
 
 # import middleware
@@ -322,6 +322,9 @@ async def account_page(request: Request, conn = Depends(connect_db)):
         name = get_role_name(role)
         role_names[role] = name
 
+    # block info
+    block_info = get_block_info_s(request, session.get("username", ""), conn)
+
     context = {
         "request": request,
         "firstname": session.get("firstname", ""),
@@ -333,7 +336,9 @@ async def account_page(request: Request, conn = Depends(connect_db)):
         "role_names": role_names,
 
         "logged_in": logged_in,
-        "username": session.get("username", "Anonymous")
+        "username": session.get("username", "Anonymous"),
+        "block_info": block_info,
+        "block_duration": datetime.fromisoformat(block_info.get("block_until")).strftime("%d.%m.%Y %H:%M:%S") if block_info.get("block_until") else None
     }
     return templates.TemplateResponse("account.html", context)
 

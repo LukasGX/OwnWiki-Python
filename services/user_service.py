@@ -410,3 +410,31 @@ def send_email_s(request: Request, username: str, message: str, conn):
     )
 
     return {"status": "success", "message": f"Message sent to '{username}'"}
+
+def get_block_info_s(request: Request, username: str, conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+    user = cursor.fetchone()
+
+    if user is None:
+        return {"status": "error", "message": f"User '{username}' not found"}
+
+    user_id = user[0]
+
+    cursor.execute("SELECT block_until, withdrawnRights, is_permanent, reason FROM blocks WHERE user_id = ?", (user_id,))
+    block_info = cursor.fetchone()
+
+    if block_info is None:
+        return {"status": "success", "blocked": False}
+
+    block_until, withdrawn_rights, is_permanent, reason = block_info
+    blocked = True
+
+    return {
+        "status": "success",
+        "blocked": blocked,
+        "block_until": block_until,
+        "withdrawn_rights": withdrawn_rights.split(";") if withdrawn_rights else [],
+        "is_permanent": bool(is_permanent),
+        "reason": reason
+    }

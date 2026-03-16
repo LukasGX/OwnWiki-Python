@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, Request, Body
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from api.v1.deps import connect_db
-from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s, register_s, activate_account_s, rename_s, block_user_s, send_email_s
+from services.user_service import get_encrypted, login_s, logout_s, get_roles_s, change_roles_s, register_s, activate_account_s, rename_s, block_user_s, send_email_s, get_block_info_s
 from api.v1.deps import protect, protect_with_rights
 from typing import Dict, List
 
@@ -66,6 +66,11 @@ async def change_name(request: Request, username: str, rename_data: RenameData, 
 async def block_user(request: Request, username: str, block_until: str = Body(...), withdrawn_rights: List[str] = Body(...), permanent: bool = Body(False), reason: str = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_block), conn = Depends(connect_db)):
     """Required right: userrights"""
     return block_user_s(request, username, block_until, withdrawn_rights, permanent, reason, conn)
+
+@router.get("/block/{username}")
+async def get_block_info(request: Request, username: str, user_roles: Dict[str, List[str]] = Depends(protect_read), conn = Depends(connect_db)):
+    """Required right: read"""
+    return get_block_info_s(request, username, conn)
 
 @router.post("/email/{username}")
 async def send_email(request: Request, username: str, message: str = Body(...), user_roles: Dict[str, List[str]] = Depends(protect_read), conn = Depends(connect_db)):
