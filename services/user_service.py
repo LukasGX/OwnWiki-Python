@@ -356,6 +356,7 @@ def block_user_s(request: Request, username: str, block_until: str, withdrawn_ri
                 FOOTER_LINK="ownwiki.org",
                 REASON=reason,
                 BLOCK_TYPE=block_type,
+                BLOCK_ADMIN=request.session.get("username"),
                 END_STRING=end_string,
                 EXPIRY_NOTE=expiry_note,
                 LOGO_SRC=logo_src
@@ -421,13 +422,23 @@ def get_block_info_s(request: Request, username: str, conn):
 
     user_id = user[0]
 
-    cursor.execute("SELECT block_until, withdrawnRights, is_permanent, reason FROM blocks WHERE user_id = ?", (user_id,))
+    cursor.execute("""
+                   SELECT
+                   block_until,
+                   withdrawnRights,
+                   is_permanent,
+                   reason,
+                   u.username as admin_username
+                   FROM blocks b
+                   LEFT JOIN users u ON b.admin_id = u.id
+                   WHERE user_id = ?
+                   """, (user_id,))
     block_info = cursor.fetchone()
 
     if block_info is None:
         return {"status": "success", "blocked": False}
 
-    block_until, withdrawn_rights, is_permanent, reason = block_info
+    block_until, withdrawn_rights, is_permanent, reason, admin_username = block_info
     blocked = True
 
     return {
@@ -436,5 +447,6 @@ def get_block_info_s(request: Request, username: str, conn):
         "block_until": block_until,
         "withdrawn_rights": withdrawn_rights.split(";") if withdrawn_rights else [],
         "is_permanent": bool(is_permanent),
-        "reason": reason
+        "reason": reason,
+        "admin": admin_username
     }

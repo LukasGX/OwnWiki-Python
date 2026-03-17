@@ -11,8 +11,10 @@
 		class="search-bar" />
 	<div class="user-menu">
 		{% if logged_in %}
-		<i
-			class="{% if 'admin' in user_roles %}fas fa-user-plus{% elif block_info.blocked %}fas fa-user-lock{% else %}fas fa-user{% endif %} icon"></i>
+		<a href="/account" class="invis">
+			<i
+				class="{% if 'admin' in user_roles %}fas fa-user-shield{% elif block_info.blocked %}fas fa-user-lock{% else %}fas fa-user{% endif %} icon"></i>
+		</a>
 		{% else %}
 		<img
 			src="resources/user-question.svg"
