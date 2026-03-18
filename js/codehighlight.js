@@ -846,7 +846,20 @@ async function blockUser() {
 	}
 }
 
-function blockProcedure(blockLink) {
+let USER_IS_BLOCKED = false;
+
+async function blockProcedure(blockLink) {
+	let username = PAGE.split(":")[1];
+	const status_response = await fetch(`/api/v1/user/block/${username}`, {
+		method: "GET"
+	});
+	const status_data = await status_response.json();
+
+	if (status_response.ok && status_data.blocked) {
+		blockLink.textContent = "Sperre verwalten";
+		USER_IS_BLOCKED = true;
+	}
+
 	blockLink.addEventListener("click", async () => {
 		const ui_txts = JSON.parse(UI);
 
@@ -860,16 +873,24 @@ function blockProcedure(blockLink) {
 			const withdrawnByDefault = item && item.withdrawnByDefault === true;
 			const lockDefault = item && item.lockDefault === true;
 
-			rows += `
+			if (!USER_IS_BLOCKED)
+				rows += `
 				<tr class="auto_cb_marking">
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${right}</td>
-					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><label for="blockopt_${right}">${role}</label></td>
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${role}</td>
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="${lockDefault ? "" : `blockopt_${right}`}" ${withdrawnByDefault ? "checked" : ""} ${lockDefault ? "disabled" : ""} /></td>
+				</tr>`;
+			else
+				rows += `
+				<tr class="auto_cb_marking">
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${right}</td>
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${role}</td>
+					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="${lockDefault ? "" : `blockopt_${right}`}" ${status_data.withdrawn_rights.includes(right) ? "checked" : ""} ${lockDefault ? "disabled" : ""} /></td>
 				</tr>`;
 		});
 
 		openModal(`
-			<h2>Benutzer sperren</h2>
+			<h2>${USER_IS_BLOCKED ? "Sperre verwalten" : "Benutzer sperren"}</h2>
 			${ui_txts.tools.block.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.block.warning}</p>` : ""}
 			${ui_txts.tools.block.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.block.info}</p>` : ""}
 			<table>
@@ -880,19 +901,23 @@ function blockProcedure(blockLink) {
 				</tr>
 				${rows}
 			</table>
-			<p><input type="checkbox" id="permanent" name="permanent" /> <label for="permanent">Dauerhafte Sperrung</label></p>
-			<label for="duration">Dauer der Sperrung:</label>
-			<input type="text" id="duration" name="duration" placeholder="z.B. 1j 3m 2w 5h 8min" />
+			<p><input type="checkbox" id="permanent" name="permanent" ${status_data.is_permanent ? "checked" : ""} /> <label for="permanent">Dauerhafte Sperrung</label></p>
+			<label for="duration" id="duration_label" style="${status_data.is_permanent ? "display: none;" : ""}">Dauer der Sperrung:</label>
+			<input type="text" id="duration" name="duration" placeholder="z.B. 1j 3m 2w 5h 8min" style="${status_data.is_permanent ? "display: none;" : ""}" />
 			<label for="reason">Grund für die Sperrung:</label><br />
-			<textarea id="reason" name="reason"></textarea>
-			<button id="blockBtn">Jetzt sperren</button> <button class="cancelButton" id="close-modal">Abbrechen</button>
+			<textarea id="reason" name="reason">${status_data.reason}</textarea>
+			<button id="blockBtn">${status_data.blocked ? "Sperre aktualisieren" : "Jetzt sperren"}</button> <button class="cancelButton" id="close-modal">Abbrechen</button>
 		`);
 
 		document.getElementById("permanent").addEventListener("change", () => {
 			if (document.getElementById("permanent").checked) {
 				document.getElementById("duration").style.display = "none";
+				document.getElementById("duration_label").style.display =
+					"none";
 			} else {
 				document.getElementById("duration").style.display = "block";
+				document.getElementById("duration_label").style.display =
+					"block";
 			}
 		});
 
