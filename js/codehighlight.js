@@ -875,14 +875,14 @@ async function blockProcedure(blockLink) {
 
 			if (!USER_IS_BLOCKED)
 				rows += `
-				<tr class="auto_cb_marking">
+				<tr class="auto_cb_marking" data-lockdefault="${lockDefault}">
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${right}</td>
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${role}</td>
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="${lockDefault ? "" : `blockopt_${right}`}" ${withdrawnByDefault ? "checked" : ""} ${lockDefault ? "disabled" : ""} /></td>
 				</tr>`;
 			else
 				rows += `
-				<tr class="auto_cb_marking">
+				<tr class="auto_cb_marking"  data-lockdefault="${lockDefault}">
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${right}</td>
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;">${role}</td>
 					<td onclick="handleClickL('blockopt_${right}')" style="cursor: pointer;"><input type="checkbox" name="${right}" id="${lockDefault ? "" : `blockopt_${right}`}" ${status_data.withdrawn_rights.includes(right) ? "checked" : ""} ${lockDefault ? "disabled" : ""} /></td>
@@ -893,6 +893,7 @@ async function blockProcedure(blockLink) {
 			<h2>${USER_IS_BLOCKED ? "Sperre verwalten" : "Benutzer sperren"}</h2>
 			${ui_txts.tools.block.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.block.warning}</p>` : ""}
 			${ui_txts.tools.block.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.block.info}</p>` : ""}
+			<input type="checkbox" id="hide-locked" checked> <label for="hide-locked">Gesperrte ausblenden</label>
 			<table>
 				<tr>
 					<td>Benutzerrecht</td>
@@ -928,6 +929,21 @@ async function blockProcedure(blockLink) {
 		document
 			.getElementById("blockBtn")
 			.addEventListener("click", blockUser);
+
+		const hideLockedCB = document.getElementById("hide-locked");
+		function hideLocked() {
+			const elements = document.querySelectorAll(
+				"tr[data-lockdefault=true]"
+			);
+			if (hideLockedCB.checked) {
+				elements.forEach((el) => (el.style.display = "none"));
+			} else {
+				elements.forEach((el) => (el.style.display = "table-row"));
+			}
+		}
+
+		hideLockedCB.addEventListener("change", hideLocked);
+		hideLocked();
 	});
 }
 
