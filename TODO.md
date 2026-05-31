@@ -9,16 +9,17 @@
 ## Technik & Plattform
 
 - [ ] WYSWYG Editor integrieren
-- [ ] Suchfunktion implementieren (mit Autovervollständigung)
+- [x] Suchfunktion implementieren
+- [ ] Autovervollständigung für Suche
 - [ ] Navigation & UI-Design festlegen (Menüs, Breadcrumbs, responsives Layout)
 - [ ] Versionierung der Inhalte
 - [ ] Backup- und Exportfunktion hinzufügen (JSON, XML)
 - [ ] Automatisierte Tests für Kernfunktionen einführen
-- [ ] Seiten löschen
+- [x] Seiten löschen
 - [ ] Benutzerinformationen
 - [ ] Admin-UI: Matrix (Rollen in Spalten, Rechte in Reihen)
 - [ ] Import
-- [ ] Template-Parameter {{{abc}}} (Aufruf mit {{Vorlage|abc=xyz}})
+- [x] Templates/Template-Parameter ##abc (Aufruf mit @Vorlage:xyz)
 - [ ] Zeitlich begrenzte Benutzerrollen
 - [ ] Kategorie-System (evtl. mit \$CATEGORY:ABC\$)
 - [ ] Codeblöcke mit Highlighting
@@ -43,9 +44,9 @@
 - [ ] Meldungsfunktion
 - [ ] Admin-Dashboard
 - [ ] Externe Inhalte als Vorschlag von Benutzern, von Admins bestätigt
-- [ ] Benutzerseiten
+- [x] Benutzerseiten
 - [ ] Badges für Benutzer (zentral verwaltet; rein informativ)
-- [ ] Benutzer-Blocking
+- [x] Benutzer-Blocking
 - [ ] Archivierung von Seiten (Nicht mehr in der Standard-Suche)
 - [ ] Crashkurse (für verschiedene Rollen)
 - [ ] Speicherung von Suchanfragen als Favoriten
