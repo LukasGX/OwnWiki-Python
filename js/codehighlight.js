@@ -525,7 +525,7 @@ if (deleteLink) {
 			<h2>Seite ${word}</h2>
 			${ui_txts.tools.delete.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.delete.warning}</p>` : ""}
 			${ui_txts.tools.delete.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.delete.info}</p>` : ""}
-			<button onclick="changeDeletion('${ns}', '${name}', ${status})">Jetzt ${word}</button>
+			<button onclick="changeDeletion('${ns}', '${name}', ${status})" ${word == "löschen" ? `class="extDeleteButton"` : ""}>Jetzt ${word}</button>
 		`);
 	});
 }
@@ -716,7 +716,7 @@ function renameProcedure(renameLink, proceedToUsers = false) {
 			${ui_txts.tools.rename.warning_active ? `<p class="warning_small"><i class="fas fa-warning"></i> ${ui_txts.tools.rename.warning}</p>` : ""}
 			${ui_txts.tools.rename.info_active ? `<p class="info_small"><i class="fas fa-circle-info"></i> ${ui_txts.tools.rename.info}</p>` : ""}
 			<input type="text" id="new_username_input" value="${username}" />
-			<button id="renameBtn">Jetzt umbenennen</button>
+			<button id="renameBtn" class="extDeleteButton">Jetzt umbenennen</button>
 		`);
 
 		document.getElementById("renameBtn").addEventListener("click", () => {
@@ -894,7 +894,8 @@ async function blockProcedure(blockLink) {
 			<input type="text" id="duration" name="duration" placeholder="z.B. 1j 3m 2w 5h 8min" style="${status_data.is_permanent ? "display: none;" : ""}" />
 			<label for="reason">Grund für die Sperrung:</label><br />
 			<textarea id="reason" name="reason">${status_data.reason}</textarea>
-			<button id="blockBtn">${status_data.blocked ? "Sperre aktualisieren" : "Jetzt sperren"}</button> <button class="cancelButton" id="close-modal">Abbrechen</button>
+			${USER_IS_BLOCKED ? `<button id="endBlockBtn" class="extDeleteButton">Sperre aufheben</button>` : ""}
+			<button id="blockBtn" ${status_data.blocked ? "" : `class="extDeleteButton"`}>${status_data.blocked ? "Sperre aktualisieren" : "Jetzt sperren"}</button> <button class="cancelButton" id="close-modal">Abbrechen</button>
 		`);
 
 		document.getElementById("permanent").addEventListener("change", () => {
