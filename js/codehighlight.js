@@ -613,33 +613,20 @@ function permissionsProcedure(userRolesLink) {
 		username = userRolesLink.getAttribute("data-username");
 	}
 
-	let roles = USERROLES;
-	let conv = true;
-
-	if (userRolesLink.getAttribute("data-userroles")) {
-		roles = userRolesLink
-			.getAttribute("data-userroles")
-			.replaceAll("'", '"');
-		conv = false;
-	}
-
 	userRolesLink.addEventListener("click", async () => {
 		try {
 			const response = await fetch(`/static/roles.json`);
 			const jsonObject = await response.json();
 
-			let cleanRoles = roles.replaceAll(/&#39;/g, '"');
-			const userData = JSON.parse(cleanRoles);
-			let userRolesArray = [];
-			if (conv) userRolesArray = userData.roles || [];
-			else userRolesArray = userData || [];
+			const rolesResponse = await fetch(`/api/v1/user/${username}/roles`);
+			const rolesData = await rolesResponse.json();
 
 			let boxes = "";
 			jsonObject.forEach((role) => {
-				const checked = userRolesArray.includes(role.name || role);
+				const checked = rolesData.roles.includes(role);
 				boxes += `
-                    <input type="checkbox" name="${role.name || role}" id="role_${role.name || role}" 
-                           ${checked ? "checked" : ""} /> <label for="role_${role.name || role}">${role.name || role}</label><br />
+                    <input type="checkbox" name="${role}" id="role_${role}" 
+                           ${checked ? "checked" : ""} /> <label for="role_${role}">${role}</label><br />
                 `;
 			});
 			const ui_txts = JSON.parse(UI);
