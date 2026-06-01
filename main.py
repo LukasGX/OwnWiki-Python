@@ -1,4 +1,6 @@
 from datetime import datetime
+import os
+import random
 from babel.dates import format_datetime
 import json
 import re
@@ -910,3 +912,23 @@ async def test_email(request: Request):
         "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
     }
     return templates.TemplateResponse("email.html", context)
+
+@app.get("/randompage")
+async def random_page(request: Request, conn = Depends(connect_db)):
+    """
+    Redirects to a random page.
+    """
+    update_session(request, request.session.get("username", ""), conn)
+
+    # get all pages from /pages/article directory, NOT DB
+    article_dir = "pages/article"
+    articles = []
+    for filename in os.listdir(article_dir):
+        if filename.endswith(".md"):
+            articles.append(filename[:-3])
+    
+    if not articles:
+        return RedirectResponse(url="/", status_code=302)
+    
+    random_article = random.choice(articles)
+    return RedirectResponse(url=f"/wiki/article:{random_article}", status_code=302)
