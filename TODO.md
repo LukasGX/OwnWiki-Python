@@ -22,7 +22,7 @@
 - [x] Templates/Template-Parameter ##abc (Aufruf mit @Vorlage:xyz)
 - [ ] Zeitlich begrenzte Benutzerrollen
 - [ ] Kategorie-System (evtl. mit \$CATEGORY:ABC\$)
-- [ ] Codeblöcke mit Highlighting
+- [x] Codeblöcke mit Highlighting
 - [ ] Verschachtelte Templates (max. Tiefe 1)
 - [ ] Visuelle Versionsgeschichte
 - [ ] Benachrichtigungssystem: Push, Email, Benachrichtigungscenter
