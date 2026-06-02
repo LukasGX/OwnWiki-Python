@@ -186,7 +186,8 @@ async def login_page(request: Request):
         "just_activated": just_activated,
         "block_info": block_info,
         "block_duration": block_duration,
-        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", []))),
+        "ui": {}
     }
     return templates.TemplateResponse("login.html", context)
 
@@ -218,7 +219,8 @@ async def login_page(request: Request):
         "request": request,
         "block_info": block_info,
         "block_duration": block_duration,
-        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", [])))
+        "user_roles": (request.session.get("roles", [])[0].split(";") if len(request.session.get("roles", []))>0 and isinstance(request.session.get("roles", [])[0], str) else list(request.session.get("roles", []))),
+        "ui": {}
     }
     return templates.TemplateResponse("register.html", context)
 
@@ -394,6 +396,7 @@ async def account_page(request: Request, conn = Depends(connect_db)):
         "roles": (roles or rolesr),
         "role_colors": role_colors,
         "role_names": role_names,
+        "ui": {},
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
@@ -667,6 +670,7 @@ async def create_page(request: Request, page: str = Path(..., min_length=1), con
         "needed_right": needed_right,
         "page": page,
         "permissions": user_rights,
+        "ui": {},
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
@@ -806,6 +810,7 @@ async def forbidden_page(request: Request):
         "request": request,
         "page": page,
         "right": right,
+        "ui": {},
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
@@ -849,6 +854,7 @@ async def page_not_found(request: Request):
     context = {
         "request": request,
         "page": page,
+        "ui": {},
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
@@ -903,6 +909,7 @@ async def test_email(request: Request):
         "request": request,
         "needed_right": needed_right,
         "permissions": user_rights,
+        "ui": {},
 
         "logged_in": logged_in,
         "username": session.get("username", "Anonymous"),
