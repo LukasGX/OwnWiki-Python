@@ -2,7 +2,10 @@ import markdown
 import re
 
 def get_html(md: str):
-    html = markdown.markdown(md)
+    html = markdown.markdown(
+        md,
+        extensions=["fenced_code"]
+    )
 
     # Templates
     def repl(match):

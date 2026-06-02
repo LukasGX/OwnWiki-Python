@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 import random
-from babel.dates import format_datetime
 import json
 import re
 from fastapi import Depends, FastAPI, HTTPException, Request, Path
@@ -920,7 +919,6 @@ async def random_page(request: Request, conn = Depends(connect_db)):
     """
     update_session(request, request.session.get("username", ""), conn)
 
-    # get all pages from /pages/article directory, NOT DB
     article_dir = "pages/article"
     articles = []
     for filename in os.listdir(article_dir):

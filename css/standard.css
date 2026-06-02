@@ -1103,3 +1103,8 @@ tr.auto_cb_marking:has(input:checked) td {
 	background: rgba(255, 0, 0, 0.1);
 	text-decoration: line-through;
 }
+
+code.hljs {
+	border-radius: 8px;
+	background-color: #f1f1f1;
+}
